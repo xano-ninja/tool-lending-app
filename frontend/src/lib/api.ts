@@ -14,28 +14,10 @@
 //     schemas under the same keys.
 //   • Response types: `import type` the def. InferResponse erases to nothing.
 //
-// Nothing here imports the manifest yet — an add-on's endpoints may already be
-// in it. Wire an endpoint (one in xano/, or an add-on's) like:
-//
-//   import type { InferResponse } from "@xano/sdk";
-//   import type { createNoteQuery } from "../../../xano/api/create-note.js";
-//   import { ROUTES, routePath, type RouteInputs } from "../../../xano/routes.gen.js";
-//
-//   export type CreateNoteBody = RouteInputs["POST create_note"];
-//   export type Note = InferResponse<typeof createNoteQuery>;
-//
-//   export async function createNote(body: CreateNoteBody): Promise<Note> {
-//     const res = await fetch(XANO_HOST + routePath("POST create_note"), {
-//       method: ROUTES["POST create_note"].verb,
-//       headers: { "content-type": "application/json" },
-//       body: JSON.stringify(body),
-//     });
-//     if (!res.ok) throw new Error(await res.text());
-//     return res.json();
-//   }
-//
-// Keys are "<VERB> <query name>"; path params are passed by name, e.g.
-// routePath("GET notes/{id}", { id }). A renamed endpoint is a compile error.
+
+import type { InferResponse } from "@xano/sdk";
+import type { itemsQuery } from "../../../xano/api/items.js";
+import { ROUTES, routePath, type RouteInputs } from "../../../xano/routes.gen.js";
 
 // Types the global the deploy injects, for every file in the project: the
 // documented `window.XANO_HOST` reads compile anywhere. `undefined` in dev.
@@ -54,3 +36,18 @@ export const XANO_HOST: string =
   (typeof window !== "undefined" && window.XANO_HOST) ||
   import.meta.env.VITE_XANO_HOST ||
   "";
+
+export type ItemFilters = RouteInputs["GET items"];
+export type Item = InferResponse<typeof itemsQuery>[number];
+
+export async function listItems(filters: ItemFilters = {}): Promise<Item[]> {
+  const params = new URLSearchParams();
+  if (filters.category) params.set("category", filters.category);
+  if (filters.status) params.set("status", filters.status);
+  const qs = params.size ? `?${params}` : "";
+  const res = await fetch(XANO_HOST + routePath("GET items") + qs, {
+    method: ROUTES["GET items"].verb,
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
