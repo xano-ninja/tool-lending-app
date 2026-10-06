@@ -1,26 +1,27 @@
 # tool-lending-app
 
-[![Built on Xano](https://img.shields.io/badge/built_on-Xano-0055FF)](https://xano.com)
+Lending app for a neighborhood or makerspace tool library. Members browse the
+catalog of drills, ladders and saws and request items for a date range; admins
+approve loans, mark returns and log condition notes.
 
-_Describe tool-lending-app here: what it does and who it is for._
+Built so far: the `item` table, `GET /items` with `category` and `status`
+filters, and a catalog page that uses it. Loans, waitlists, auth and the
+nightly overdue task are not built yet.
 
-The backend under [`xano/`](xano/) is TypeScript, authored with the
-[Xano SDK](https://github.com/xano-sdk/sdk) and running on [Xano](https://xano.com). It runs
-on your machine as the **Xano Engine** and ships to Xano's cloud with the same command. The
-SvelteKit frontend under [`frontend/`](frontend/) takes its request paths and types
-from the backend defs rather than hand-typing them.
+The backend under [`xano/`](xano/) is TypeScript on the [Xano SDK](https://github.com/xano-sdk/sdk).
+The SvelteKit frontend under [`frontend/`](frontend/) takes its request paths and
+types from the backend defs.
 
-## Quick start
+## Run it
 
 ```bash
 npm install
-npm run xano:deploy   # run the backend on the Xano Engine, on this machine
-npm run dev           # run the frontend, already pointed at it
+npm run xano:deploy   # backend on the local Xano Engine, seeded with sample items
+npm run dev           # frontend, pointed at it
 ```
 
-No Xano account needed. Then author your backend in [`xano/index.ts`](xano/index.ts),
-starting with the walkthrough in [`xano/EXAMPLE.md`](xano/EXAMPLE.md), and rerun
-`npm run xano:deploy` after each change.
+No Xano account needed. `npm run xano:check` and `npm run build` must pass
+before a change is done.
 
 ## Run it on your machine
 
