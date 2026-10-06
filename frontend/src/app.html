@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tool-lending-app</title>
+
+    <!-- Drop a favicon.png into frontend/static/ and link it here:
+         <link rel="icon" href="%sveltekit.assets%/favicon.png" />
+         Everything in that directory is copied to the site root verbatim. -->
+    <!-- Keep this inside <head>: `xanosdk deploy --static-env` injects the
+         backend URL here as a window global that frontend/src/lib/api.ts reads. -->
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
