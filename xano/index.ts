@@ -1,9 +1,12 @@
 import { workspace } from "@xano/sdk";
+import { registerAuth } from "@xano-sdk/auth";
 import { api } from "./api/group.js";
-import { itemsQuery } from "./api/items.js";
+import { createItemQuery, itemQuery, itemsQuery, updateItemQuery } from "./api/items.js";
 import { itemTable } from "./tables/item.js";
 
-export default workspace("tool-lending-app")
+const app = workspace("tool-lending-app")
   .registerTables([itemTable])
   .registerApiGroups([api])
-  .registerQueries([itemsQuery]);
+  .registerQueries([itemsQuery, itemQuery, createItemQuery, updateItemQuery]);
+
+export default registerAuth(app, { canonical: "authn" });

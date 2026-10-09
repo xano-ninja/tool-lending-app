@@ -1,16 +1,51 @@
 {
   "version": 1,
   "objects": {
+    "app:Authentication": {
+      "guid": "418bb3d99f5c721ab78c30d97d651e90",
+      "canonical": "authn",
+      "canonical_source": "code"
+    },
     "app:tool_library": {
       "guid": "1b5b32d777b6fe488c6578a6eeb5c9f1",
       "canonical": "tools",
       "canonical_source": "code"
     },
+    "dbo:account": {
+      "guid": "f2f78af06c7c59b550823db5edae97bc"
+    },
+    "dbo:event_log": {
+      "guid": "e9148697952846994def7eb0a467d6cd"
+    },
     "dbo:item": {
       "guid": "6af51aa538418a14f613d30184410c9d"
     },
+    "dbo:user": {
+      "guid": "efb558104909137dac95907814c26051"
+    },
+    "function:Getting Started Template/create_event_log": {
+      "guid": "19bb274c20b194d7fa03ca4bafb3ac4c"
+    },
+    "query:Authentication|GET|auth/me": {
+      "guid": "8e64176a70b122ffed0ce68ceed6b9ce"
+    },
+    "query:Authentication|POST|auth/login": {
+      "guid": "35b7bbd1552626fbc8b7b6c1115c70df"
+    },
+    "query:Authentication|POST|auth/signup": {
+      "guid": "ad508f9d25b77a54e415db5c45d0d8d0"
+    },
     "query:tool_library|GET|items": {
       "guid": "7669e7265cb71e060de45974adf368d8"
+    },
+    "query:tool_library|GET|items/{id}": {
+      "guid": "92e877808a4d2be0c1f1e2d1c12e5419"
+    },
+    "query:tool_library|PATCH|items/{id}": {
+      "guid": "a9d4b464376ab0f5dacf593474236851"
+    },
+    "query:tool_library|POST|items": {
+      "guid": "30071eb47faea9e654b30cdc29b1cb91"
     }
   }
 }
