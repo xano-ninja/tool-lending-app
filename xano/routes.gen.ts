@@ -82,7 +82,13 @@ function fillParams(
 }
 
 export const ROUTES = {
+  "POST auth/login": { verb: "POST", path: "/api:authn/auth/login" },
+  "GET auth/me": { verb: "GET", path: "/api:authn/auth/me" },
+  "POST auth/signup": { verb: "POST", path: "/api:authn/auth/signup" },
   "GET items": { verb: "GET", path: "/api:tools/items" },
+  "POST items": { verb: "POST", path: "/api:tools/items" },
+  "GET items/{id}": { verb: "GET", path: "/api:tools/items/{id}" },
+  "PATCH items/{id}": { verb: "PATCH", path: "/api:tools/items/{id}" },
 } as const;
 
 /**
@@ -91,7 +97,18 @@ export const ROUTES = {
  */
 export type RouteName = keyof typeof ROUTES;
 
+/** `N` when it is a union of two or more route names, else `never`. */
+type ManyRoutes<N> = [(N extends unknown ? (x: N) => void : never) extends (x: infer I) => void ? I : never] extends [never] ? N : never;
+
+/** A union of route names (e.g. a `key: RouteName` parameter): params checked at runtime. */
+export function routePath<N extends RouteName>(name: ManyRoutes<N>, params?: Record<string, string | number>): string;
+export function routePath(name: "POST auth/login"): string;
+export function routePath(name: "GET auth/me"): string;
+export function routePath(name: "POST auth/signup"): string;
 export function routePath(name: "GET items"): string;
+export function routePath(name: "POST items"): string;
+export function routePath(name: "GET items/{id}", params: { "id": string | number }): string;
+export function routePath(name: "PATCH items/{id}", params: { "id": string | number }): string;
 
 export function routePath(name: RouteName, params?: Record<string, string | number>): string {
   // Read through a widened view: a workspace with no endpoints at all makes
@@ -113,8 +130,36 @@ export function routePath(name: RouteName, params?: Record<string, string | numb
  * the linked table's columns, which is what the server accepts.
  */
 export type RouteInputs = {
+  "POST auth/login": {
+    email?: string;
+    password?: string;
+  };
+  "GET auth/me": {};
+  "POST auth/signup": {
+    name?: string;
+    email?: string;
+    password?: string;
+  };
   "GET items": {
     category?: string;
+    status?: "available" | "on_loan" | "in_repair" | "retired";
+  };
+  "POST items": {
+    name: string;
+    category: string;
+    description?: string;
+    photo?: string;
+    status?: "available" | "on_loan" | "in_repair" | "retired";
+  };
+  "GET items/{id}": {
+    id: number;
+  };
+  "PATCH items/{id}": {
+    id: number;
+    name?: string;
+    category?: string;
+    description?: string;
+    photo?: string;
     status?: "available" | "on_loan" | "in_repair" | "retired";
   };
 };
