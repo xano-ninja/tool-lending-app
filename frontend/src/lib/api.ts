@@ -17,6 +17,13 @@
 
 import type { InferResponse } from "@xano/sdk";
 import type { itemQuery, itemsQuery } from "../../../xano/api/items.js";
+import type { myLoansQuery, requestLoanQuery } from "../../../xano/api/loans.js";
+import type { addNoteQuery } from "../../../xano/api/notes.js";
+import type {
+  joinWaitlistQuery,
+  leaveWaitlistQuery,
+  myWaitlistQuery,
+} from "../../../xano/api/waitlist.js";
 import type { loginQuery, meQuery } from "@xano-sdk/auth";
 import { ROUTES, routePath, type RouteInputs } from "../../../xano/routes.gen.js";
 
@@ -54,6 +61,16 @@ export async function listItems(filters: ItemFilters = {}): Promise<Item[]> {
 }
 
 export type ItemDetail = InferResponse<typeof itemQuery>;
+export type ConditionNote = InferResponse<typeof addNoteQuery>;
+export type Loan = InferResponse<typeof requestLoanQuery>;
+export type LoanRequest = RouteInputs["POST loans"];
+export type MyLoan = Omit<InferResponse<typeof myLoansQuery>[number], "item_name"> & {
+  item_name: string | null;
+};
+export type WaitlistEntry = InferResponse<typeof joinWaitlistQuery>;
+export type MyWaitlistEntry = Omit<InferResponse<typeof myWaitlistQuery>[number], "item_name"> & {
+  item_name: string | null;
+};
 export type Credentials = RouteInputs["POST auth/login"];
 export type SignupInput = RouteInputs["POST auth/signup"];
 export type Session = InferResponse<typeof loginQuery>;
@@ -110,13 +127,47 @@ export function getItem(id: number) {
 }
 
 export function createItem(input: RouteInputs["POST items"]) {
-  return request<ItemDetail>("POST items", routePath("POST items"), input);
+  return request<Item>("POST items", routePath("POST items"), input);
 }
 
 export function updateItem(id: number, input: Omit<RouteInputs["PATCH items/{id}"], "id">) {
-  return request<ItemDetail>(
+  return request<Item>(
     "PATCH items/{id}",
     routePath("PATCH items/{id}", { id }),
+    input,
+  );
+}
+
+export function requestLoan(input: LoanRequest) {
+  return request<Loan>("POST loans", routePath("POST loans"), input);
+}
+
+export function myLoans() {
+  return request<MyLoan[]>("GET me/loans", routePath("GET me/loans"));
+}
+
+export function joinWaitlist(id: number) {
+  return request<WaitlistEntry>(
+    "POST items/{id}/waitlist",
+    routePath("POST items/{id}/waitlist", { id }),
+  );
+}
+
+export function leaveWaitlist(id: number) {
+  return request<InferResponse<typeof leaveWaitlistQuery>>(
+    "DELETE items/{id}/waitlist",
+    routePath("DELETE items/{id}/waitlist", { id }),
+  );
+}
+
+export function myWaitlist() {
+  return request<MyWaitlistEntry[]>("GET me/waitlist", routePath("GET me/waitlist"));
+}
+
+export function addNote(id: number, input: Omit<RouteInputs["POST items/{id}/notes"], "id">) {
+  return request<ConditionNote>(
+    "POST items/{id}/notes",
+    routePath("POST items/{id}/notes", { id }),
     input,
   );
 }

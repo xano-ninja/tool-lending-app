@@ -75,15 +75,17 @@
     <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {#each items as item (item.id)}
         <li>
-          <Card.Root class="h-full">
-            <Card.Header>
-              <Card.Title>{item.name}</Card.Title>
-              <Card.Description>{item.category} · {item.status.replace("_", " ")}</Card.Description>
-            </Card.Header>
-            {#if item.description}
-              <Card.Content class="text-sm">{item.description}</Card.Content>
-            {/if}
-          </Card.Root>
+          <a href="/items/{item.id}" class="block h-full">
+            <Card.Root class="hover:border-primary h-full transition-colors">
+              <Card.Header>
+                <Card.Title>{item.name}</Card.Title>
+                <Card.Description>{item.category} · {item.status.replace("_", " ")}</Card.Description>
+              </Card.Header>
+              {#if item.description}
+                <Card.Content class="text-sm">{item.description}</Card.Content>
+              {/if}
+            </Card.Root>
+          </a>
         </li>
       {/each}
     </ul>

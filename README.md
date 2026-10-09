@@ -4,8 +4,9 @@ Lending app for a neighborhood or makerspace tool library. Members browse the
 catalog of drills, ladders and saws and request items for a date range; admins
 approve loans, mark returns and log condition notes.
 
-Built so far: the `item` table, `GET /items` with `category` and `status`
-filters, and a catalog page that uses it. Loans, waitlists, auth and the
+Built so far: email sign-in, the catalog, an item page where members request
+a loan, join the waitlist and read the loan history and condition notes, and a
+My loans page. Admin approval, check-out and return, the admin pages and the
 nightly overdue task are not built yet.
 
 The backend under [`xano/`](xano/) is TypeScript on the [Xano SDK](https://github.com/xano-sdk/sdk).

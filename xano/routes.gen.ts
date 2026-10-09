@@ -89,6 +89,12 @@ export const ROUTES = {
   "POST items": { verb: "POST", path: "/api:tools/items" },
   "GET items/{id}": { verb: "GET", path: "/api:tools/items/{id}" },
   "PATCH items/{id}": { verb: "PATCH", path: "/api:tools/items/{id}" },
+  "POST items/{id}/notes": { verb: "POST", path: "/api:tools/items/{id}/notes" },
+  "DELETE items/{id}/waitlist": { verb: "DELETE", path: "/api:tools/items/{id}/waitlist" },
+  "POST items/{id}/waitlist": { verb: "POST", path: "/api:tools/items/{id}/waitlist" },
+  "POST loans": { verb: "POST", path: "/api:tools/loans" },
+  "GET me/loans": { verb: "GET", path: "/api:tools/me/loans" },
+  "GET me/waitlist": { verb: "GET", path: "/api:tools/me/waitlist" },
 } as const;
 
 /**
@@ -109,6 +115,12 @@ export function routePath(name: "GET items"): string;
 export function routePath(name: "POST items"): string;
 export function routePath(name: "GET items/{id}", params: { "id": string | number }): string;
 export function routePath(name: "PATCH items/{id}", params: { "id": string | number }): string;
+export function routePath(name: "POST items/{id}/notes", params: { "id": string | number }): string;
+export function routePath(name: "DELETE items/{id}/waitlist", params: { "id": string | number }): string;
+export function routePath(name: "POST items/{id}/waitlist", params: { "id": string | number }): string;
+export function routePath(name: "POST loans"): string;
+export function routePath(name: "GET me/loans"): string;
+export function routePath(name: "GET me/waitlist"): string;
 
 export function routePath(name: RouteName, params?: Record<string, string | number>): string {
   // Read through a widened view: a workspace with no endpoints at all makes
@@ -162,6 +174,23 @@ export type RouteInputs = {
     photo?: string;
     status?: "available" | "on_loan" | "in_repair" | "retired";
   };
+  "POST items/{id}/notes": {
+    id: number;
+    note: string;
+  };
+  "DELETE items/{id}/waitlist": {
+    id: number;
+  };
+  "POST items/{id}/waitlist": {
+    id: number;
+  };
+  "POST loans": {
+    item_id: number;
+    start_date: string | null;
+    due_date: string | null;
+  };
+  "GET me/loans": {};
+  "GET me/waitlist": {};
 };
 
 /** The path params of every realtime channel, keyed exactly like CHANNELS. */
