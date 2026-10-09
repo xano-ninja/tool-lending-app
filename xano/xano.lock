@@ -14,17 +14,29 @@
     "dbo:account": {
       "guid": "f2f78af06c7c59b550823db5edae97bc"
     },
+    "dbo:condition_note": {
+      "guid": "5a53c39b7261527b970d6f6ee0283644"
+    },
     "dbo:event_log": {
       "guid": "e9148697952846994def7eb0a467d6cd"
     },
     "dbo:item": {
       "guid": "6af51aa538418a14f613d30184410c9d"
     },
+    "dbo:loan": {
+      "guid": "4ad9d505f67be5a8513dbbbe0459b631"
+    },
     "dbo:user": {
       "guid": "efb558104909137dac95907814c26051"
     },
+    "dbo:waitlist": {
+      "guid": "ca23178d31cd38e0091d5b09fb3ac740"
+    },
     "function:Getting Started Template/create_event_log": {
       "guid": "19bb274c20b194d7fa03ca4bafb3ac4c"
+    },
+    "function:request_loan": {
+      "guid": "89e63f5a97c8dbdd68a420833af211cd"
     },
     "query:Authentication|GET|auth/me": {
       "guid": "8e64176a70b122ffed0ce68ceed6b9ce"
@@ -35,17 +47,47 @@
     "query:Authentication|POST|auth/signup": {
       "guid": "ad508f9d25b77a54e415db5c45d0d8d0"
     },
+    "query:tool_library|DELETE|items/{id}/waitlist": {
+      "guid": "1e4c4b95de8a5ff6b136628080d274cd"
+    },
     "query:tool_library|GET|items": {
       "guid": "7669e7265cb71e060de45974adf368d8"
     },
     "query:tool_library|GET|items/{id}": {
       "guid": "92e877808a4d2be0c1f1e2d1c12e5419"
     },
+    "query:tool_library|GET|me/loans": {
+      "guid": "dadebb51ce6547d61e6f1718fe46112b"
+    },
+    "query:tool_library|GET|me/waitlist": {
+      "guid": "d174e9e9629124c3c4800f6137779bf6"
+    },
     "query:tool_library|PATCH|items/{id}": {
       "guid": "a9d4b464376ab0f5dacf593474236851"
     },
     "query:tool_library|POST|items": {
       "guid": "30071eb47faea9e654b30cdc29b1cb91"
+    },
+    "query:tool_library|POST|items/{id}/notes": {
+      "guid": "9f0a5ac5947fb166a9bc8285131ca7b6"
+    },
+    "query:tool_library|POST|items/{id}/waitlist": {
+      "guid": "f13950d35cbdbfb29346d696753e7514"
+    },
+    "query:tool_library|POST|loans": {
+      "guid": "bd41779c2aa4cd9296246b37d98605cd"
+    },
+    "workflow_test:loan request refuses a due date before the start": {
+      "guid": "a88e0b0a5efa81822c7db96b08c32600"
+    },
+    "workflow_test:loan request refuses a retired item": {
+      "guid": "0547a658ee32cc9036c78c52aa0a2d85"
+    },
+    "workflow_test:loan request refuses a second open request": {
+      "guid": "efdfc01aea0f144086610103e82b8a56"
+    },
+    "workflow_test:loan request starts as requested": {
+      "guid": "b6b3a214e26bf1be98983aecf77d0863"
     }
   }
 }
