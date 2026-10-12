@@ -56,6 +56,9 @@
     "query:tool_library|GET|items/{id}": {
       "guid": "92e877808a4d2be0c1f1e2d1c12e5419"
     },
+    "query:tool_library|GET|loans": {
+      "guid": "741927a381b4e17193be86c24b89cadc"
+    },
     "query:tool_library|GET|me/loans": {
       "guid": "dadebb51ce6547d61e6f1718fe46112b"
     },
@@ -64,6 +67,18 @@
     },
     "query:tool_library|PATCH|items/{id}": {
       "guid": "a9d4b464376ab0f5dacf593474236851"
+    },
+    "query:tool_library|PATCH|loans/{id}/approve": {
+      "guid": "dd32957f710a18cef0aff1c3855b898a"
+    },
+    "query:tool_library|PATCH|loans/{id}/checkout": {
+      "guid": "c50591de4baeb73f6cecf3b2cb4cd2a8"
+    },
+    "query:tool_library|PATCH|loans/{id}/reject": {
+      "guid": "1258715057f1a95f213cd30e7a07ba74"
+    },
+    "query:tool_library|PATCH|loans/{id}/return": {
+      "guid": "f2fdea86c90459e009c83d376ba29cb0"
     },
     "query:tool_library|POST|items": {
       "guid": "30071eb47faea9e654b30cdc29b1cb91"

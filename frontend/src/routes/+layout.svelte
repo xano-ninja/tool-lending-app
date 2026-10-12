@@ -18,6 +18,9 @@
   <nav class="mx-auto flex max-w-5xl items-center gap-4 px-8 py-3 text-sm">
     <a href="/" class="font-semibold">Tool library</a>
     <a href="/me/loans" class="text-muted-foreground hover:text-foreground">My loans</a>
+    {#if session.user?.role === "admin"}
+      <a href="/admin" class="text-muted-foreground hover:text-foreground">Admin</a>
+    {/if}
     <span class="ml-auto"></span>
     {#if session.user}
       <span class="text-muted-foreground">{session.user.name}</span>

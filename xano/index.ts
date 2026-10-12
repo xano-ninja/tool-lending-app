@@ -1,6 +1,13 @@
 import { workspace } from "@xano/sdk";
 import { registerAuth } from "@xano-sdk/auth";
 import { api } from "./api/group.js";
+import {
+  approveLoanQuery,
+  checkoutLoanQuery,
+  loansQuery,
+  rejectLoanQuery,
+  returnLoanQuery,
+} from "./api/admin_loans.js";
 import { createItemQuery, itemQuery, itemsQuery, updateItemQuery } from "./api/items.js";
 import { myLoansQuery, requestLoanQuery } from "./api/loans.js";
 import { addNoteQuery } from "./api/notes.js";
@@ -32,6 +39,11 @@ const app = workspace("tool-lending-app")
     leaveWaitlistQuery,
     myWaitlistQuery,
     addNoteQuery,
+    loansQuery,
+    approveLoanQuery,
+    rejectLoanQuery,
+    checkoutLoanQuery,
+    returnLoanQuery,
   ])
   .registerWorkflowTests([loanRequestTest, loanDatesTest, loanDuplicateTest, loanRetiredTest]);
 

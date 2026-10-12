@@ -5,9 +5,10 @@ catalog of drills, ladders and saws and request items for a date range; admins
 approve loans, mark returns and log condition notes.
 
 Built so far: email sign-in, the catalog, an item page where members request
-a loan, join the waitlist and read the loan history and condition notes, and a
-My loans page. Admin approval, check-out and return, the admin pages and the
-nightly overdue task are not built yet.
+a loan, join the waitlist and read the loan history and condition notes, a My
+loans page, and admin pages for approving, rejecting, checking out and returning
+loans and for adding and editing items. The nightly overdue task and waitlist
+notifications are not built yet.
 
 The backend under [`xano/`](xano/) is TypeScript on the [Xano SDK](https://github.com/xano-sdk/sdk).
 The SvelteKit frontend under [`frontend/`](frontend/) takes its request paths and

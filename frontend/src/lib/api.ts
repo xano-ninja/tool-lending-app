@@ -16,6 +16,7 @@
 //
 
 import type { InferResponse } from "@xano/sdk";
+import type { loansQuery } from "../../../xano/api/admin_loans.js";
 import type { itemQuery, itemsQuery } from "../../../xano/api/items.js";
 import type { myLoansQuery, requestLoanQuery } from "../../../xano/api/loans.js";
 import type { addNoteQuery } from "../../../xano/api/notes.js";
@@ -71,6 +72,12 @@ export type WaitlistEntry = InferResponse<typeof joinWaitlistQuery>;
 export type MyWaitlistEntry = Omit<InferResponse<typeof myWaitlistQuery>[number], "item_name"> & {
   item_name: string | null;
 };
+export type LoanFilters = RouteInputs["GET loans"];
+export type AdminLoan = Omit<InferResponse<typeof loansQuery>[number], "item_name" | "user_name"> & {
+  item_name: string | null;
+  user_name: string | null;
+};
+export type ItemInput = RouteInputs["POST items"];
 export type Credentials = RouteInputs["POST auth/login"];
 export type SignupInput = RouteInputs["POST auth/signup"];
 export type Session = InferResponse<typeof loginQuery>;
@@ -170,4 +177,16 @@ export function addNote(id: number, input: Omit<RouteInputs["POST items/{id}/not
     routePath("POST items/{id}/notes", { id }),
     input,
   );
+}
+
+export function listLoans(filters: LoanFilters = {}) {
+  const qs = filters.status ? `?status=${filters.status}` : "";
+  return request<AdminLoan[]>("GET loans", routePath("GET loans") + qs);
+}
+
+export type LoanAction = "approve" | "reject" | "checkout" | "return";
+
+export function actOnLoan(id: number, action: LoanAction) {
+  const route = `PATCH loans/{id}/${action}` as const;
+  return request<Loan>(route, routePath(route, { id }));
 }
