@@ -92,7 +92,12 @@ export const ROUTES = {
   "POST items/{id}/notes": { verb: "POST", path: "/api:tools/items/{id}/notes" },
   "DELETE items/{id}/waitlist": { verb: "DELETE", path: "/api:tools/items/{id}/waitlist" },
   "POST items/{id}/waitlist": { verb: "POST", path: "/api:tools/items/{id}/waitlist" },
+  "GET loans": { verb: "GET", path: "/api:tools/loans" },
   "POST loans": { verb: "POST", path: "/api:tools/loans" },
+  "PATCH loans/{id}/approve": { verb: "PATCH", path: "/api:tools/loans/{id}/approve" },
+  "PATCH loans/{id}/checkout": { verb: "PATCH", path: "/api:tools/loans/{id}/checkout" },
+  "PATCH loans/{id}/reject": { verb: "PATCH", path: "/api:tools/loans/{id}/reject" },
+  "PATCH loans/{id}/return": { verb: "PATCH", path: "/api:tools/loans/{id}/return" },
   "GET me/loans": { verb: "GET", path: "/api:tools/me/loans" },
   "GET me/waitlist": { verb: "GET", path: "/api:tools/me/waitlist" },
 } as const;
@@ -118,7 +123,12 @@ export function routePath(name: "PATCH items/{id}", params: { "id": string | num
 export function routePath(name: "POST items/{id}/notes", params: { "id": string | number }): string;
 export function routePath(name: "DELETE items/{id}/waitlist", params: { "id": string | number }): string;
 export function routePath(name: "POST items/{id}/waitlist", params: { "id": string | number }): string;
+export function routePath(name: "GET loans"): string;
 export function routePath(name: "POST loans"): string;
+export function routePath(name: "PATCH loans/{id}/approve", params: { "id": string | number }): string;
+export function routePath(name: "PATCH loans/{id}/checkout", params: { "id": string | number }): string;
+export function routePath(name: "PATCH loans/{id}/reject", params: { "id": string | number }): string;
+export function routePath(name: "PATCH loans/{id}/return", params: { "id": string | number }): string;
 export function routePath(name: "GET me/loans"): string;
 export function routePath(name: "GET me/waitlist"): string;
 
@@ -184,10 +194,25 @@ export type RouteInputs = {
   "POST items/{id}/waitlist": {
     id: number;
   };
+  "GET loans": {
+    status?: "requested" | "approved" | "out" | "returned" | "rejected" | "overdue";
+  };
   "POST loans": {
     item_id: number;
     start_date: string | null;
     due_date: string | null;
+  };
+  "PATCH loans/{id}/approve": {
+    id: number;
+  };
+  "PATCH loans/{id}/checkout": {
+    id: number;
+  };
+  "PATCH loans/{id}/reject": {
+    id: number;
+  };
+  "PATCH loans/{id}/return": {
+    id: number;
   };
   "GET me/loans": {};
   "GET me/waitlist": {};
