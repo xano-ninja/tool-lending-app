@@ -7,8 +7,16 @@ approve loans, mark returns and log condition notes.
 Built so far: email sign-in, the catalog, an item page where members request
 a loan, join the waitlist and read the loan history and condition notes, a My
 loans page, and admin pages for approving, rejecting, checking out and returning
-loans and for adding and editing items. The nightly overdue task and waitlist
-notifications are not built yet.
+loans, for a member's loan history, and for adding and editing items.
+
+A nightly task (`nightly_overdue`, 03:00 UTC) flags loans that are out past
+their due date and emails the borrower. Returning an item emails the first
+member on its waitlist; requesting a loan takes the member off that waitlist.
+Both emails go through Xano's built-in mailer, and a failed send does not
+fail the return or the nightly run.
+
+`npm run xano:test` runs the workflow tests in `xano/tests/` against the
+deployed backend.
 
 The backend under [`xano/`](xano/) is TypeScript on the [Xano SDK](https://github.com/xano-sdk/sdk).
 The SvelteKit frontend under [`frontend/`](frontend/) takes its request paths and
