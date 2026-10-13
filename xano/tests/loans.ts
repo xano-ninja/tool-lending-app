@@ -2,6 +2,7 @@ import { workflowTest, s, ref, c } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { requestLoanFn } from "../functions/request_loan.js";
 import { itemTable } from "../tables/item.js";
+import { waitlistTable } from "../tables/waitlist.js";
 
 const fixtures = (status: "available" | "retired" = "available") => [
   s.db.add({
@@ -69,5 +70,20 @@ export const loanRetiredTest = workflowTest({
       body: [...fixtures("retired"), request("2026-11-01", "2026-11-08")],
       exception: c.text("retired"),
     }),
+  ],
+});
+
+export const loanWaitlistTest = workflowTest({
+  name: "loan request takes the member off the waitlist",
+  stack: [
+    ...fixtures(),
+    s.db.add({
+      table: waitlistTable,
+      row: { item_id: ref("item.id"), user_id: ref("member.id") },
+      as: "entry",
+    }),
+    request("2026-11-01", "2026-11-08"),
+    s.db.get({ table: waitlistTable, fieldValue: ref("entry.id"), as: "after" }),
+    s.expect.to_be_null({ expr: ref("after") }),
   ],
 });
