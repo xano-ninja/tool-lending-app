@@ -67,7 +67,10 @@
         {loan.item_name ?? `Item ${loan.item_id}`}
       </a>
       <p class="text-muted-foreground text-sm">
-        {loan.user_name ?? `User ${loan.user_id}`} · {formatDate(loan.start_date)} to {formatDate(loan.due_date)}
+        <a href="/admin/members/{loan.user_id}" class="hover:underline">
+          {loan.user_name ?? `User ${loan.user_id}`}
+        </a>
+        · {formatDate(loan.start_date)} to {formatDate(loan.due_date)}
       </p>
     </div>
     <div class="flex items-center gap-2">

@@ -35,8 +35,20 @@
     "function:Getting Started Template/create_event_log": {
       "guid": "19bb274c20b194d7fa03ca4bafb3ac4c"
     },
+    "function:checkout_loan": {
+      "guid": "6813c81399b11d587da9ac162bf9f0fd"
+    },
+    "function:flag_overdue_loans": {
+      "guid": "6cc57f41d2e0863b60c4b56973945c57"
+    },
     "function:request_loan": {
       "guid": "89e63f5a97c8dbdd68a420833af211cd"
+    },
+    "function:return_loan": {
+      "guid": "8300916450595f2099c79d01e2d09a91"
+    },
+    "function:transition_loan": {
+      "guid": "31a6af62a899fef5790c4e2eb5ba4383"
     },
     "query:Authentication|GET|auth/me": {
       "guid": "8e64176a70b122ffed0ce68ceed6b9ce"
@@ -65,6 +77,9 @@
     "query:tool_library|GET|me/waitlist": {
       "guid": "d174e9e9629124c3c4800f6137779bf6"
     },
+    "query:tool_library|GET|members/{id}/loans": {
+      "guid": "35e4e4eaf6d9406b310d5b2efcacdcd5"
+    },
     "query:tool_library|PATCH|items/{id}": {
       "guid": "a9d4b464376ab0f5dacf593474236851"
     },
@@ -92,6 +107,21 @@
     "query:tool_library|POST|loans": {
       "guid": "bd41779c2aa4cd9296246b37d98605cd"
     },
+    "task:nightly_overdue": {
+      "guid": "0f98aadae2a0c46e413cfd5378c86443"
+    },
+    "workflow_test:approve moves a requested loan to approved": {
+      "guid": "9aadfcb3aaa645f34a78b7991861bd06"
+    },
+    "workflow_test:approve refuses a loan that is not requested": {
+      "guid": "037eb372c8fe64b1b58f771cc327ea8f"
+    },
+    "workflow_test:checkout puts the item on loan": {
+      "guid": "fd3024cd964e9ca08f7440588b33707b"
+    },
+    "workflow_test:checkout refuses an item in repair": {
+      "guid": "c208befb2b716abb6c3df9820e91305a"
+    },
     "workflow_test:loan request refuses a due date before the start": {
       "guid": "a88e0b0a5efa81822c7db96b08c32600"
     },
@@ -103,6 +133,21 @@
     },
     "workflow_test:loan request starts as requested": {
       "guid": "b6b3a214e26bf1be98983aecf77d0863"
+    },
+    "workflow_test:loan request takes the member off the waitlist": {
+      "guid": "99522ed5260bb552749b9d7b86ef1d27"
+    },
+    "workflow_test:overdue job flags only loans out past due": {
+      "guid": "209be9f156db65823005fafc1f4cc99c"
+    },
+    "workflow_test:return frees the item and notifies the waitlist": {
+      "guid": "14edc07a8d624ff32e52c9ad8685a824"
+    },
+    "workflow_test:return refuses a loan that is not out": {
+      "guid": "e6de2cbca37c4c044e85ad974730f370"
+    },
+    "workflow_test:return with an empty waitlist notifies no one": {
+      "guid": "4d57c34027fa7c3e2972018e51eda131"
     }
   }
 }

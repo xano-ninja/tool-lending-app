@@ -32,14 +32,15 @@ export function formatTimestamp(ms: number): string {
   });
 }
 
-type LoanLike = { status: string; due_date: string };
+type LoanLike = { status: string; due_date: string; overdue?: boolean };
 
 export function isOverdue(loan: LoanLike): boolean {
-  return loan.status === "out" && loan.due_date < today();
+  return loan.status === "out" && (loan.overdue === true || loan.due_date < today());
 }
 
 export function loanLabel(loan: LoanLike): string {
   if (isOverdue(loan)) return "overdue";
+  if (loan.status === "returned" && loan.overdue) return "returned late";
   return loan.status === "out" ? "checked out" : loan.status;
 }
 

@@ -1,5 +1,6 @@
-import { query, input, inp, col, cmp, expr, s, ref, c, guard, obj, withFilters, fl } from "@xano/sdk";
+import { query, input, inp, col, cmp, expr, s, ref, c, guard, withFilters, fl } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
 import { api } from "./group.js";
@@ -65,17 +66,9 @@ function transition(
     input: { id: input.int({ required: true }) },
     stack: [
       ...guard.role(userTable, "admin"),
-      s.db.get({ table: loanTable, fieldValue: inp("id"), as: "loan" }),
-      guard.found("loan", { message: "Loan not found." }),
-      s.precondition({
-        expr: expr(ref("loan.status"), "=", c.text(from)),
-        error_type: "badrequest",
-        error: c.text(`Loan is not ${from}.`),
-      }),
-      s.db.patch({
-        table: loanTable,
-        fieldValue: inp("id"),
-        data: obj({ status: c.text(to) }),
+      s.function.run({
+        fn: transitionLoanFn,
+        input: { loan_id: inp("id"), from: c.text(from), to: c.text(to) },
         as: "updated",
       }),
     ],
@@ -94,30 +87,7 @@ export const checkoutLoanQuery = query({
   input: { id: input.int({ required: true }) },
   stack: [
     ...guard.role(userTable, "admin"),
-    s.db.get({ table: loanTable, fieldValue: inp("id"), as: "loan" }),
-    guard.found("loan", { message: "Loan not found." }),
-    s.precondition({
-      expr: expr(ref("loan.status"), "=", c.text("approved")),
-      error_type: "badrequest",
-      error: c.text("Loan is not approved."),
-    }),
-    s.db.get({ table: itemTable, fieldValue: ref("loan.item_id"), as: "item" }),
-    s.precondition({
-      expr: expr(ref("item.status"), "=", c.text("available")),
-      error_type: "badrequest",
-      error: c.text("Item is not available."),
-    }),
-    s.db.patch({
-      table: itemTable,
-      fieldValue: ref("loan.item_id"),
-      data: obj({ status: c.text("on_loan") }),
-    }),
-    s.db.patch({
-      table: loanTable,
-      fieldValue: inp("id"),
-      data: obj({ status: c.text("out") }),
-      as: "updated",
-    }),
+    s.function.run({ fn: checkoutLoanFn, input: { loan_id: inp("id") }, as: "updated" }),
   ],
   response: ref("updated"),
 });
@@ -130,24 +100,7 @@ export const returnLoanQuery = query({
   input: { id: input.int({ required: true }) },
   stack: [
     ...guard.role(userTable, "admin"),
-    s.db.get({ table: loanTable, fieldValue: inp("id"), as: "loan" }),
-    guard.found("loan", { message: "Loan not found." }),
-    s.precondition({
-      expr: expr(ref("loan.status"), "=", c.text("out")),
-      error_type: "badrequest",
-      error: c.text("Loan is not checked out."),
-    }),
-    s.db.patch({
-      table: itemTable,
-      fieldValue: ref("loan.item_id"),
-      data: obj({ status: c.text("available") }),
-    }),
-    s.db.patch({
-      table: loanTable,
-      fieldValue: inp("id"),
-      data: obj({ status: c.text("returned"), returned_at: c.now() }),
-      as: "updated",
-    }),
+    s.function.run({ fn: returnLoanFn, input: { loan_id: inp("id") }, as: "result" }),
   ],
-  response: ref("updated"),
+  response: ref("result.loan"),
 });

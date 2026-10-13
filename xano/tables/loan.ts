@@ -14,6 +14,7 @@ export const loanTable = table({
     due_date: f.date({ required: true }),
     returned_at: f.timestamp({ nullable: true }),
     status: f.enum([...LOAN_STATUSES], { required: true, default: "requested" }),
+    overdue: f.bool({ default: false }),
   },
   index: [
     { type: "btree", fields: [{ name: "item_id" }] },
