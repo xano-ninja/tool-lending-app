@@ -1,6 +1,7 @@
 import { defineFunction, input, inp, col, cmp, expr, s, ref, c, guard } from "@xano/sdk";
 import { itemTable } from "../tables/item.js";
 import { loanTable, OPEN_LOAN_STATUSES } from "../tables/loan.js";
+import { waitlistTable } from "../tables/waitlist.js";
 
 export const requestLoanFn = defineFunction({
   name: "request_loan",
@@ -48,6 +49,19 @@ export const requestLoanFn = defineFunction({
         status: "requested",
       },
       as: "loan",
+    }),
+    s.db.query({
+      table: waitlistTable,
+      where: [
+        expr(col("item_id"), "=", inp("item_id")),
+        expr(col("user_id"), "=", inp("user_id")),
+      ],
+      returnType: "single",
+      as: "waiting",
+    }),
+    s.conditional({
+      when: expr(ref("waiting"), "!=", c.null()),
+      then: [s.db.del({ table: waitlistTable, fieldValue: ref("waiting.id") })],
     }),
   ],
   response: ref("loan"),
