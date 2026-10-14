@@ -76,3 +76,30 @@ export const myWaitlistQuery = query({
   ],
   response: ref("entries"),
 });
+
+export const itemWaitlistQuery = query({
+  name: "items/{id}/waitlist",
+  verb: "GET",
+  apiGroup: api,
+  auth: userTable,
+  input: { id: input.int({ required: true }) },
+  stack: [
+    ...guard.role(userTable, "admin"),
+    s.db.query({
+      table: waitlistTable,
+      where: expr(col("item_id"), "=", inp("id")),
+      bind: [
+        {
+          table: userTable,
+          as: "user_row",
+          join: "left",
+          where: expr(col("user_id"), "=", col("user_row.id")),
+        },
+      ],
+      eval: [{ name: "user_row.name", as: "user_name" }],
+      sort: [{ sortBy: "created_at", dir: "asc" }],
+      as: "entries",
+    }),
+  ],
+  response: ref("entries"),
+});

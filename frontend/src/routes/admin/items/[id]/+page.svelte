@@ -4,8 +4,8 @@
 
   import { Button } from "$lib/components/ui/button/index.js";
   import ItemForm from "$lib/components/item-form.svelte";
-  import { getItem, updateItem, type Item, type ItemInput } from "$lib/api";
-  import { errorMessage } from "$lib/format";
+  import { getItem, itemWaitlist, updateItem, type Item, type ItemWaitlistEntry, type ItemInput } from "$lib/api";
+  import { errorMessage, formatTimestamp } from "$lib/format";
   import { session } from "$lib/session.svelte";
 
   const id = $derived(Number(page.params.id));
@@ -13,6 +13,7 @@
 
   let item = $state<Item | null>(null);
   let error = $state("");
+  let waitlist = $state<ItemWaitlistEntry[]>([]);
 
   async function save(input: ItemInput) {
     await updateItem(id, input);
@@ -24,6 +25,9 @@
     getItem(id)
       .then((detail) => (item = detail.item))
       .catch((e) => (error = errorMessage(e, "Could not load this item.")));
+    itemWaitlist(id)
+      .then((entries) => (waitlist = entries))
+      .catch(() => (waitlist = []));
   });
 </script>
 
@@ -42,6 +46,21 @@
     <p class="text-destructive text-sm">{error}</p>
   {:else if item}
     <ItemForm {item} onsubmit={save} submitLabel="Save" />
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Waitlist</h2>
+      {#if waitlist.length === 0}
+        <p class="text-muted-foreground text-sm">Nobody is waiting.</p>
+      {:else}
+        <ol class="list-decimal space-y-1 pl-5 text-sm">
+          {#each waitlist as entry (entry.id)}
+            <li>
+              <a class="underline" href="/admin/members/{entry.user_id}">{entry.user_name ?? `Member ${entry.user_id}`}</a>
+              <span class="text-muted-foreground">since {formatTimestamp(entry.created_at)}</span>
+            </li>
+          {/each}
+        </ol>
+      {/if}
+    </section>
   {:else}
     <p class="text-muted-foreground text-sm">Loading...</p>
   {/if}
