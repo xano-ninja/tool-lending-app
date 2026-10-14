@@ -91,6 +91,7 @@ export const ROUTES = {
   "PATCH items/{id}": { verb: "PATCH", path: "/api:tools/items/{id}" },
   "POST items/{id}/notes": { verb: "POST", path: "/api:tools/items/{id}/notes" },
   "DELETE items/{id}/waitlist": { verb: "DELETE", path: "/api:tools/items/{id}/waitlist" },
+  "GET items/{id}/waitlist": { verb: "GET", path: "/api:tools/items/{id}/waitlist" },
   "POST items/{id}/waitlist": { verb: "POST", path: "/api:tools/items/{id}/waitlist" },
   "GET loans": { verb: "GET", path: "/api:tools/loans" },
   "POST loans": { verb: "POST", path: "/api:tools/loans" },
@@ -123,6 +124,7 @@ export function routePath(name: "GET items/{id}", params: { "id": string | numbe
 export function routePath(name: "PATCH items/{id}", params: { "id": string | number }): string;
 export function routePath(name: "POST items/{id}/notes", params: { "id": string | number }): string;
 export function routePath(name: "DELETE items/{id}/waitlist", params: { "id": string | number }): string;
+export function routePath(name: "GET items/{id}/waitlist", params: { "id": string | number }): string;
 export function routePath(name: "POST items/{id}/waitlist", params: { "id": string | number }): string;
 export function routePath(name: "GET loans"): string;
 export function routePath(name: "POST loans"): string;
@@ -191,6 +193,9 @@ export type RouteInputs = {
     note: string;
   };
   "DELETE items/{id}/waitlist": {
+    id: number;
+  };
+  "GET items/{id}/waitlist": {
     id: number;
   };
   "POST items/{id}/waitlist": {

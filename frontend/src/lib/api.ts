@@ -25,6 +25,7 @@ import type {
   joinWaitlistQuery,
   leaveWaitlistQuery,
   myWaitlistQuery,
+  itemWaitlistQuery,
 } from "../../../xano/api/waitlist.js";
 import type { loginQuery, meQuery } from "@xano-sdk/auth";
 import { ROUTES, routePath, type RouteInputs } from "../../../xano/routes.gen.js";
@@ -72,6 +73,9 @@ export type MyLoan = Omit<InferResponse<typeof myLoansQuery>[number], "item_name
 export type WaitlistEntry = InferResponse<typeof joinWaitlistQuery>;
 export type MyWaitlistEntry = Omit<InferResponse<typeof myWaitlistQuery>[number], "item_name"> & {
   item_name: string | null;
+};
+export type ItemWaitlistEntry = Omit<InferResponse<typeof itemWaitlistQuery>[number], "user_name"> & {
+  user_name: string | null;
 };
 export type LoanFilters = RouteInputs["GET loans"];
 export type AdminLoan = Omit<InferResponse<typeof loansQuery>[number], "item_name" | "user_name"> & {
@@ -200,5 +204,12 @@ export function memberLoans(id: number) {
   return request<MemberLoans>(
     "GET members/{id}/loans",
     routePath("GET members/{id}/loans", { id }),
+  );
+}
+
+export function itemWaitlist(id: number) {
+  return request<ItemWaitlistEntry[]>(
+    "GET items/{id}/waitlist",
+    routePath("GET items/{id}/waitlist", { id }),
   );
 }

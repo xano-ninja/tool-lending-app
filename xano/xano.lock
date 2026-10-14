@@ -68,6 +68,9 @@
     "query:tool_library|GET|items/{id}": {
       "guid": "92e877808a4d2be0c1f1e2d1c12e5419"
     },
+    "query:tool_library|GET|items/{id}/waitlist": {
+      "guid": "920bd1f92b9862f2c26954b39b38f993"
+    },
     "query:tool_library|GET|loans": {
       "guid": "741927a381b4e17193be86c24b89cadc"
     },
