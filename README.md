@@ -10,10 +10,19 @@ loans page, and admin pages for approving, rejecting, checking out and returning
 loans, for a member's loan history, and for adding and editing items.
 
 A nightly task (`nightly_overdue`, 03:00 UTC) flags loans that are out past
-their due date and emails the borrower. Returning an item emails the first
-member on its waitlist; requesting a loan takes the member off that waitlist.
-Both emails go through Xano's built-in mailer, and a failed send does not
-fail the return or the nightly run.
+their due date and emails the borrower.
+
+When an item comes back on the shelf (returned, out of repair, or a request
+for it rejected), the first member on its waitlist is emailed and the item is
+held for them for two days (`HOLD_DAYS` in `xano/waitlist_hold.ts`). Nobody
+else on the waitlist is notified while a hold is open or while a loan for the
+item is approved. Requesting a loan takes the member off the waitlist. If the
+holder leaves the waitlist or an admin removes them, the next member is
+notified at once; if they do nothing, `nightly_waitlist` (03:15 UTC) drops
+the lapsed hold and moves on.
+
+Emails go through Xano's built-in mailer, and a failed send does not fail the
+request that triggered it or the nightly run.
 
 `npm run xano:test` runs the workflow tests in `xano/tests/` against the
 deployed backend.
