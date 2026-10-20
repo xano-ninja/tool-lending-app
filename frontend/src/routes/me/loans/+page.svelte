@@ -2,7 +2,15 @@
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { leaveWaitlist, myLoans, myWaitlist, type MyLoan, type MyWaitlistEntry } from "$lib/api";
-  import { errorMessage, formatDate, formatTimestamp, isOverdue, loanLabel, loanVariant } from "$lib/format";
+  import {
+    errorMessage,
+    formatDate,
+    formatTimestamp,
+    holdUntil,
+    isOverdue,
+    loanLabel,
+    loanVariant,
+  } from "$lib/format";
   import { session } from "$lib/session.svelte";
 
   let loans = $state<MyLoan[]>([]);
@@ -97,14 +105,24 @@
       {:else}
         <ul class="divide-y rounded-lg border">
           {#each waitlist as entry (entry.id)}
+            {@const held = holdUntil(entry.notified_at)}
             <li class="flex items-center justify-between gap-3 px-4 py-3">
               <div class="space-y-0.5">
                 <a href="/items/{entry.item_id}" class="font-medium hover:underline">
                   {entry.item_name ?? `Item ${entry.item_id}`}
                 </a>
-                <p class="text-muted-foreground text-sm">since {formatTimestamp(entry.created_at)}</p>
+                <p class="text-muted-foreground text-sm">
+                  {#if held}
+                    Held for you until {held}. <a href="/items/{entry.item_id}" class="underline">Request it</a>
+                  {:else}
+                    since {formatTimestamp(entry.created_at)}
+                  {/if}
+                </p>
               </div>
-              <Button variant="ghost" size="sm" onclick={() => leave(entry)}>Leave</Button>
+              <div class="flex items-center gap-2">
+                {#if held}<Badge>your turn</Badge>{/if}
+                <Button variant="ghost" size="sm" onclick={() => leave(entry)}>Leave</Button>
+              </div>
             </li>
           {/each}
         </ul>

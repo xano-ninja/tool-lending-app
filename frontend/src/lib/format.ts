@@ -1,4 +1,5 @@
 import type { BadgeVariant } from "$lib/components/ui/badge";
+import { HOLD_MS } from "../../../xano/waitlist_hold.js";
 
 export function today(): string {
   return isoDate(new Date());
@@ -30,6 +31,10 @@ export function formatTimestamp(ms: number): string {
     day: "numeric",
     year: "numeric",
   });
+}
+
+export function holdUntil(notifiedAt: number | null | undefined): string | null {
+  return notifiedAt ? formatTimestamp(notifiedAt + HOLD_MS) : null;
 }
 
 type LoanLike = { status: string; due_date: string; overdue?: boolean };
