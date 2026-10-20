@@ -62,6 +62,9 @@
     "query:tool_library|DELETE|items/{id}/waitlist": {
       "guid": "1e4c4b95de8a5ff6b136628080d274cd"
     },
+    "query:tool_library|DELETE|waitlist/{id}": {
+      "guid": "3b26e6679fd188568820a3e5eb766e99"
+    },
     "query:tool_library|GET|items": {
       "guid": "7669e7265cb71e060de45974adf368d8"
     },

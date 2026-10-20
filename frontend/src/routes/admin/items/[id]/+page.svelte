@@ -4,7 +4,7 @@
 
   import { Button } from "$lib/components/ui/button/index.js";
   import ItemForm from "$lib/components/item-form.svelte";
-  import { getItem, itemWaitlist, updateItem, type Item, type ItemWaitlistEntry, type ItemInput } from "$lib/api";
+  import { getItem, itemWaitlist, removeWaitlistEntry, updateItem, type Item, type ItemWaitlistEntry, type ItemInput } from "$lib/api";
   import { errorMessage, formatTimestamp } from "$lib/format";
   import { session } from "$lib/session.svelte";
 
@@ -18,6 +18,15 @@
   async function save(input: ItemInput) {
     await updateItem(id, input);
     await goto(`/items/${id}`);
+  }
+
+  async function remove(entryId: number) {
+    try {
+      await removeWaitlistEntry(entryId);
+      waitlist = waitlist.filter((e) => e.id !== entryId);
+    } catch (e) {
+      error = errorMessage(e, "Could not remove this entry.");
+    }
   }
 
   $effect(() => {
@@ -56,6 +65,7 @@
             <li>
               <a class="underline" href="/admin/members/{entry.user_id}">{entry.user_name ?? `Member ${entry.user_id}`}</a>
               <span class="text-muted-foreground">since {formatTimestamp(entry.created_at)}</span>
+              <Button variant="ghost" size="sm" onclick={() => remove(entry.id)}>Remove</Button>
             </li>
           {/each}
         </ol>

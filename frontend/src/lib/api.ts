@@ -26,6 +26,7 @@ import type {
   leaveWaitlistQuery,
   myWaitlistQuery,
   itemWaitlistQuery,
+  removeWaitlistEntryQuery,
 } from "../../../xano/api/waitlist.js";
 import type { loginQuery, meQuery } from "@xano-sdk/auth";
 import { ROUTES, routePath, type RouteInputs } from "../../../xano/routes.gen.js";
@@ -173,6 +174,13 @@ export function leaveWaitlist(id: number) {
   return request<InferResponse<typeof leaveWaitlistQuery>>(
     "DELETE items/{id}/waitlist",
     routePath("DELETE items/{id}/waitlist", { id }),
+  );
+}
+
+export function removeWaitlistEntry(id: number) {
+  return request<InferResponse<typeof removeWaitlistEntryQuery>>(
+    "DELETE waitlist/{id}",
+    routePath("DELETE waitlist/{id}", { id }),
   );
 }
 

@@ -103,3 +103,18 @@ export const itemWaitlistQuery = query({
   ],
   response: ref("entries"),
 });
+
+export const removeWaitlistEntryQuery = query({
+  name: "waitlist/{id}",
+  verb: "DELETE",
+  apiGroup: api,
+  auth: userTable,
+  input: { id: input.int({ required: true }) },
+  stack: [
+    ...guard.role(userTable, "admin"),
+    s.db.get({ table: waitlistTable, fieldValue: inp("id"), as: "entry" }),
+    guard.found("entry", { message: "Waitlist entry not found." }),
+    s.db.del({ table: waitlistTable, fieldValue: inp("id") }),
+  ],
+  response: { id: inp("id"), removed: c.bool(true) },
+});
