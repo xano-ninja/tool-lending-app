@@ -1,5 +1,6 @@
-import { query, input, inp, col, cmp, expr, s, ref, c, guard, withFilters, fl } from "@xano/sdk";
+import { query, input, inp, col, cmp, expr, and, s, ref, c, guard, withFilters, fl } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { notifyWaitlistFn } from "../functions/waitlist_notice.js";
 import { conditionNoteTable } from "../tables/condition_note.js";
 import { ITEM_STATUSES, itemTable } from "../tables/item.js";
 import { loanTable } from "../tables/loan.js";
@@ -140,6 +141,13 @@ export const updateItemQuery = query({
         status: keep("status"),
       },
       as: "updated",
+    }),
+    s.conditional({
+      when: and(
+        expr(ref("item.status"), "!=", c.text("available")),
+        expr(ref("updated.status"), "=", c.text("available")),
+      ),
+      then: [s.function.run({ fn: notifyWaitlistFn, input: { item_id: inp("id") } })],
     }),
   ],
   response: ref("updated"),

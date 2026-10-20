@@ -1,6 +1,7 @@
 import { query, input, inp, col, cmp, expr, s, ref, c, guard, withFilters, fl } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
+import { notifyWaitlistFn } from "../functions/waitlist_notice.js";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
 import { api } from "./group.js";
@@ -77,7 +78,24 @@ function transition(
 }
 
 export const approveLoanQuery = transition("approve", "requested", "approved");
-export const rejectLoanQuery = transition("reject", "requested", "rejected");
+
+export const rejectLoanQuery = query({
+  name: "loans/{id}/reject",
+  verb: "PATCH",
+  apiGroup: api,
+  auth: userTable,
+  input: { id: input.int({ required: true }) },
+  stack: [
+    ...guard.role(userTable, "admin"),
+    s.function.run({
+      fn: transitionLoanFn,
+      input: { loan_id: inp("id"), from: c.text("requested"), to: c.text("rejected") },
+      as: "updated",
+    }),
+    s.function.run({ fn: notifyWaitlistFn, input: { item_id: ref("updated.item_id") } }),
+  ],
+  response: ref("updated"),
+});
 
 export const checkoutLoanQuery = query({
   name: "loans/{id}/checkout",
