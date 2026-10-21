@@ -16,11 +16,13 @@ import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQue
 import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { requestLoanFn } from "./functions/request_loan.js";
+import { expireHoldsFn, notifyWaitlistFn } from "./functions/waitlist_notice.js";
 import { conditionNoteTable } from "./tables/condition_note.js";
 import { itemTable } from "./tables/item.js";
 import { loanTable } from "./tables/loan.js";
 import { waitlistTable } from "./tables/waitlist.js";
 import { overdueTask } from "./tasks/overdue.js";
+import { waitlistTask } from "./tasks/waitlist.js";
 import {
   approveTest,
   approveTwiceTest,
@@ -38,6 +40,14 @@ import {
   loanWaitlistTest,
 } from "./tests/loans.js";
 import { overdueTest } from "./tests/overdue.js";
+import {
+  expireFreshTest,
+  expireHoldTest,
+  holdFirstTest,
+  holdPromisedTest,
+  holdRepairTest,
+  holdTakenTest,
+} from "./tests/waitlist.js";
 
 const app = workspace("tool-lending-app")
   .registerTables([itemTable, loanTable, waitlistTable, conditionNoteTable])
@@ -48,8 +58,10 @@ const app = workspace("tool-lending-app")
     checkoutLoanFn,
     returnLoanFn,
     flagOverdueFn,
+    notifyWaitlistFn,
+    expireHoldsFn,
   ])
-  .registerTasks([overdueTask])
+  .registerTasks([overdueTask, waitlistTask])
   .registerQueries([
     itemsQuery,
     itemQuery,
@@ -84,6 +96,12 @@ const app = workspace("tool-lending-app")
     returnNoWaitlistTest,
     returnTwiceTest,
     overdueTest,
+    holdFirstTest,
+    holdTakenTest,
+    holdRepairTest,
+    holdPromisedTest,
+    expireHoldTest,
+    expireFreshTest,
   ]);
 
 export default registerAuth(app, { canonical: "authn" });

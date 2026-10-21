@@ -2,10 +2,11 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
 
+  import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import ItemForm from "$lib/components/item-form.svelte";
   import { getItem, itemWaitlist, removeWaitlistEntry, updateItem, type Item, type ItemWaitlistEntry, type ItemInput } from "$lib/api";
-  import { errorMessage, formatTimestamp } from "$lib/format";
+  import { errorMessage, formatTimestamp, holdUntil } from "$lib/format";
   import { session } from "$lib/session.svelte";
 
   const id = $derived(Number(page.params.id));
@@ -23,7 +24,7 @@
   async function remove(entryId: number) {
     try {
       await removeWaitlistEntry(entryId);
-      waitlist = waitlist.filter((e) => e.id !== entryId);
+      waitlist = await itemWaitlist(id);
     } catch (e) {
       error = errorMessage(e, "Could not remove this entry.");
     }
@@ -65,6 +66,9 @@
             <li>
               <a class="underline" href="/admin/members/{entry.user_id}">{entry.user_name ?? `Member ${entry.user_id}`}</a>
               <span class="text-muted-foreground">since {formatTimestamp(entry.created_at)}</span>
+              {#if entry.notified_at}
+                <Badge variant="secondary">held until {holdUntil(entry.notified_at)}</Badge>
+              {/if}
               <Button variant="ghost" size="sm" onclick={() => remove(entry.id)}>Remove</Button>
             </li>
           {/each}

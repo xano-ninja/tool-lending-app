@@ -16,12 +16,14 @@
     myWaitlist,
     requestLoan,
     type ItemDetail,
+    type MyWaitlistEntry,
   } from "$lib/api";
   import {
     addDays,
     errorMessage,
     formatDate,
     formatTimestamp,
+    holdUntil,
     loanLabel,
     loanVariant,
     today,
@@ -34,7 +36,9 @@
   let error = $state("");
   let loading = $state(true);
 
-  let onWaitlist = $state(false);
+  let myEntry = $state<MyWaitlistEntry | null>(null);
+  const onWaitlist = $derived(myEntry !== null);
+  const heldUntil = $derived(holdUntil(myEntry?.notified_at));
   let waitlistError = $state("");
 
   let startDate = $state(today());
@@ -62,9 +66,9 @@
 
   async function loadWaitlist() {
     try {
-      onWaitlist = (await myWaitlist()).some((entry) => entry.item_id === id);
+      myEntry = (await myWaitlist()).find((entry) => entry.item_id === id) ?? null;
     } catch {
-      onWaitlist = false;
+      myEntry = null;
     }
   }
 
@@ -83,6 +87,7 @@
     try {
       await requestLoan({ item_id: id, start_date: startDate, due_date: dueDate });
       requested = true;
+      myEntry = null;
     } catch (e) {
       requestError = errorMessage(e, "Could not send the request.");
     } finally {
@@ -96,8 +101,7 @@
     try {
       if (onWaitlist) await leaveWaitlist(id);
       else await joinWaitlist(id);
-      onWaitlist = !onWaitlist;
-      await load();
+      await Promise.all([load(), loadWaitlist()]);
     } catch (e) {
       waitlistError = errorMessage(e, "Could not update the waitlist.");
     } finally {
@@ -224,6 +228,12 @@
               <p class="text-sm">Request sent. An admin will review it.</p>
               <Button href="/me/loans" variant="outline" class="w-full">My loans</Button>
             {:else}
+              {#if heldUntil}
+                <p class="bg-accent text-accent-foreground rounded-md px-3 py-2 text-sm">
+                  Your turn: this item is held for you until {heldUntil}. Request it before then or it
+                  goes to the next person waiting.
+                </p>
+              {/if}
               <form class="space-y-3" onsubmit={submitRequest}>
                 <div class="space-y-2">
                   <Label for="start">From</Label>

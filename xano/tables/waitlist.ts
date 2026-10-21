@@ -7,9 +7,11 @@ export const waitlistTable = table({
   schema: {
     item_id: f.tableRef(itemTable, { required: true }),
     user_id: f.tableRef(userTable, { required: true }),
+    notified_at: f.timestamp({ nullable: true }),
   },
   index: [
     { type: "unique", fields: [{ name: "item_id" }, { name: "user_id" }] },
     { type: "btree", fields: [{ name: "user_id" }] },
+    { type: "btree", fields: [{ name: "notified_at" }] },
   ],
 });

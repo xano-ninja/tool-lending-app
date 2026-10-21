@@ -1,8 +1,7 @@
-import { defineFunction, input, inp, col, expr, s, ref, c, guard, obj, withFilters, fl } from "@xano/sdk";
-import { userTable } from "@xano-sdk/auth";
+import { defineFunction, input, inp, expr, s, ref, c, guard, obj, withFilters, fl } from "@xano/sdk";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
-import { waitlistTable } from "../tables/waitlist.js";
+import { notifyWaitlistFn } from "./waitlist_notice.js";
 
 export const transitionLoanFn = defineFunction({
   name: "transition_loan",
@@ -77,7 +76,6 @@ export const returnLoanFn = defineFunction({
       table: itemTable,
       fieldValue: ref("loan.item_id"),
       data: obj({ status: c.text("available") }),
-      as: "item",
     }),
     s.db.patch({
       table: loanTable,
@@ -85,54 +83,10 @@ export const returnLoanFn = defineFunction({
       data: obj({ status: c.text("returned"), returned_at: c.now() }),
       as: "updated",
     }),
-    s.db.query({
-      table: waitlistTable,
-      where: expr(col("item_id"), "=", ref("loan.item_id")),
-      bind: [
-        {
-          table: userTable,
-          as: "user_row",
-          join: "left",
-          where: expr(col("user_id"), "=", col("user_row.id")),
-        },
-      ],
-      eval: [
-        { name: "user_row.email", as: "email" },
-        { name: "user_row.name", as: "name" },
-      ],
-      sort: [{ sortBy: "created_at", dir: "asc" }],
-      returnType: "single",
-      as: "next",
-    }),
-    s.conditional({
-      when: expr(ref("next"), "!=", c.null()),
-      then: [
-        // A mail failure must not undo the return.
-        s.try_catch({
-          try: [
-            s.util.send_email({
-              service_provider: c.text("xano"),
-              to: ref("next.email"),
-              subject: withFilters(ref("item.name"), fl.concat(c.text(" is back"))),
-              message: withFilters(
-                c.text("Hi "),
-                fl.concat(ref("next.name")),
-                fl.concat(c.text(", the ")),
-                fl.concat(ref("item.name")),
-                fl.concat(
-                  c.text(
-                    " you are waiting for has been returned. Request it from the tool library before someone else does.",
-                  ),
-                ),
-              ),
-            }),
-          ],
-        }),
-      ],
-    }),
+    s.function.run({ fn: notifyWaitlistFn, input: { item_id: ref("loan.item_id") }, as: "notice" }),
   ],
   response: {
     loan: ref("updated"),
-    notified_user_id: ref("next.user_id", { safe: true }),
+    notified_user_id: ref("notice.notified_user_id"),
   },
 });
