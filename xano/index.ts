@@ -34,6 +34,7 @@ import {
 } from "./tests/admin_loans.js";
 import {
   loanDatesTest,
+  loanPastStartTest,
   loanDuplicateTest,
   loanRequestTest,
   loanRetiredTest,
@@ -85,6 +86,7 @@ const app = workspace("tool-lending-app")
   .registerWorkflowTests([
     loanRequestTest,
     loanDatesTest,
+    loanPastStartTest,
     loanDuplicateTest,
     loanRetiredTest,
     loanWaitlistTest,

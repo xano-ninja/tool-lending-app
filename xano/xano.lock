@@ -152,6 +152,9 @@
     "workflow_test:loan request refuses a second open request": {
       "guid": "efdfc01aea0f144086610103e82b8a56"
     },
+    "workflow_test:loan request refuses a start date in the past": {
+      "guid": "1d0b9dacbbe4b865ddef2a5e321f6f9f"
+    },
     "workflow_test:loan request starts as requested": {
       "guid": "b6b3a214e26bf1be98983aecf77d0863"
     },
