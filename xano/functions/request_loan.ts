@@ -1,4 +1,4 @@
-import { defineFunction, input, inp, col, cmp, expr, s, ref, c, guard } from "@xano/sdk";
+import { defineFunction, input, inp, col, cmp, expr, s, ref, c, guard, fl, withFilters } from "@xano/sdk";
 import { itemTable } from "../tables/item.js";
 import { loanTable, OPEN_LOAN_STATUSES } from "../tables/loan.js";
 import { waitlistTable } from "../tables/waitlist.js";
@@ -23,6 +23,12 @@ export const requestLoanFn = defineFunction({
       expr: expr(inp("due_date"), ">=", inp("start_date")),
       error_type: "badrequest",
       error: c.text("Due date must be on or after the start date."),
+    }),
+    s.set_var("today", withFilters(c.now(), fl.epochms_date("Y-m-d", "UTC"))),
+    s.precondition({
+      expr: expr(inp("start_date"), ">=", ref("today")),
+      error_type: "badrequest",
+      error: c.text("Start date cannot be in the past."),
     }),
     s.db.query({
       table: loanTable,

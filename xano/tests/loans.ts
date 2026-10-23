@@ -33,7 +33,7 @@ export const loanRequestTest = workflowTest({
   name: "loan request starts as requested",
   stack: [
     ...fixtures(),
-    request("2026-11-01", "2026-11-08"),
+    request("2099-11-01", "2099-11-08"),
     s.expect.to_equal({ expr: ref("loan.status"), value: c.text("requested") }),
     s.expect.to_equal({ expr: ref("loan.item_id"), value: ref("item.id") }),
   ],
@@ -43,8 +43,18 @@ export const loanDatesTest = workflowTest({
   name: "loan request refuses a due date before the start",
   stack: [
     s.expect.to_throw({
-      body: [...fixtures(), request("2026-11-08", "2026-11-01")],
+      body: [...fixtures(), request("2099-11-08", "2099-11-01")],
       exception: c.text("Due date must be on or after"),
+    }),
+  ],
+});
+
+export const loanPastStartTest = workflowTest({
+  name: "loan request refuses a start date in the past",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures(), request("2020-01-01", "2020-01-08")],
+      exception: c.text("Start date cannot be in the past"),
     }),
   ],
 });
@@ -55,8 +65,8 @@ export const loanDuplicateTest = workflowTest({
     s.expect.to_throw({
       body: [
         ...fixtures(),
-        request("2026-11-01", "2026-11-08", "first"),
-        request("2026-12-01", "2026-12-08", "second"),
+        request("2099-11-01", "2099-11-08", "first"),
+        request("2099-12-01", "2099-12-08", "second"),
       ],
       exception: c.text("already have an open request"),
     }),
@@ -67,7 +77,7 @@ export const loanRetiredTest = workflowTest({
   name: "loan request refuses a retired item",
   stack: [
     s.expect.to_throw({
-      body: [...fixtures("retired"), request("2026-11-01", "2026-11-08")],
+      body: [...fixtures("retired"), request("2099-11-01", "2099-11-08")],
       exception: c.text("retired"),
     }),
   ],
@@ -82,7 +92,7 @@ export const loanWaitlistTest = workflowTest({
       row: { item_id: ref("item.id"), user_id: ref("member.id") },
       as: "entry",
     }),
-    request("2026-11-01", "2026-11-08"),
+    request("2099-11-01", "2099-11-08"),
     s.db.get({ table: waitlistTable, fieldValue: ref("entry.id"), as: "after" }),
     s.expect.to_be_null({ expr: ref("after") }),
   ],
