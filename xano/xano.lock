@@ -89,6 +89,9 @@
     "query:tool_library|GET|me/waitlist": {
       "guid": "d174e9e9629124c3c4800f6137779bf6"
     },
+    "query:tool_library|GET|members": {
+      "guid": "e0d5c82aad0141290b60044a941c4cc2"
+    },
     "query:tool_library|GET|members/{id}/loans": {
       "guid": "35e4e4eaf6d9406b310d5b2efcacdcd5"
     },

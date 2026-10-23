@@ -37,3 +37,20 @@ export const memberLoansQuery = query({
   ],
   response: { member: ref("member"), loans: ref("loans") },
 });
+
+export const membersQuery = query({
+  name: "members",
+  verb: "GET",
+  apiGroup: api,
+  auth: userTable,
+  stack: [
+    ...guard.role(userTable, "admin"),
+    s.db.query({
+      table: userTable,
+      output: ["id", "name", "email", "role", "created_at"],
+      sort: [{ sortBy: "name", dir: "asc" }],
+      as: "members",
+    }),
+  ],
+  response: ref("members"),
+});

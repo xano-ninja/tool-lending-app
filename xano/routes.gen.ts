@@ -101,6 +101,7 @@ export const ROUTES = {
   "PATCH loans/{id}/return": { verb: "PATCH", path: "/api:tools/loans/{id}/return" },
   "GET me/loans": { verb: "GET", path: "/api:tools/me/loans" },
   "GET me/waitlist": { verb: "GET", path: "/api:tools/me/waitlist" },
+  "GET members": { verb: "GET", path: "/api:tools/members" },
   "GET members/{id}/loans": { verb: "GET", path: "/api:tools/members/{id}/loans" },
   "DELETE waitlist/{id}": { verb: "DELETE", path: "/api:tools/waitlist/{id}" },
 } as const;
@@ -135,6 +136,7 @@ export function routePath(name: "PATCH loans/{id}/reject", params: { "id": strin
 export function routePath(name: "PATCH loans/{id}/return", params: { "id": string | number }): string;
 export function routePath(name: "GET me/loans"): string;
 export function routePath(name: "GET me/waitlist"): string;
+export function routePath(name: "GET members"): string;
 export function routePath(name: "GET members/{id}/loans", params: { "id": string | number }): string;
 export function routePath(name: "DELETE waitlist/{id}", params: { "id": string | number }): string;
 
@@ -225,6 +227,7 @@ export type RouteInputs = {
   };
   "GET me/loans": {};
   "GET me/waitlist": {};
+  "GET members": {};
   "GET members/{id}/loans": {
     id: number;
   };

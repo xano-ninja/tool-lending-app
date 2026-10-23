@@ -5,9 +5,11 @@
     actOnLoan,
     listItems,
     listLoans,
+    listMembers,
     type AdminLoan,
     type Item,
     type LoanAction,
+    type Member,
   } from "$lib/api";
   import { errorMessage, formatDate, loanLabel, loanVariant } from "$lib/format";
   import { session } from "$lib/session.svelte";
@@ -17,6 +19,7 @@
   let overdue = $state<AdminLoan[]>([]);
   let out = $state<AdminLoan[]>([]);
   let repair = $state<Item[]>([]);
+  let members = $state<Member[]>([]);
   let error = $state("");
   let loading = $state(true);
 
@@ -27,12 +30,13 @@
     loading = true;
     error = "";
     try {
-      [requested, approved, overdue, out, repair] = await Promise.all([
+      [requested, approved, overdue, out, repair, members] = await Promise.all([
         listLoans({ status: "requested" }),
         listLoans({ status: "approved" }),
         listLoans({ status: "overdue" }),
         listLoans({ status: "out" }),
         listItems({ status: "in_repair" }),
+        listMembers(),
       ]);
     } catch (e) {
       error = errorMessage(e, "Could not load the dashboard.");
@@ -142,6 +146,21 @@
               <li class="flex items-center justify-between gap-3 px-4 py-3">
                 <a href="/items/{item.id}" class="font-medium hover:underline">{item.name}</a>
                 <Button href="/admin/items/{item.id}" variant="outline" size="sm">Edit</Button>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </section>
+      <section class="space-y-2">
+        <h2 class="text-lg font-medium">Members</h2>
+        {#if members.length === 0}
+          <p class="text-muted-foreground text-sm">No members yet.</p>
+        {:else}
+          <ul class="divide-y rounded-lg border">
+            {#each members as member (member.id)}
+              <li class="flex items-center justify-between gap-3 px-4 py-3">
+                <a href="/admin/members/{member.id}" class="font-medium hover:underline">{member.name}</a>
+                <span class="text-muted-foreground text-sm">{member.email}</span>
               </li>
             {/each}
           </ul>

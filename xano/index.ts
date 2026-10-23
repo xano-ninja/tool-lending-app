@@ -10,7 +10,7 @@ import {
 } from "./api/admin_loans.js";
 import { createItemQuery, itemQuery, itemsQuery, updateItemQuery } from "./api/items.js";
 import { myLoansQuery, requestLoanQuery } from "./api/loans.js";
-import { memberLoansQuery } from "./api/members.js";
+import { memberLoansQuery, membersQuery } from "./api/members.js";
 import { addNoteQuery } from "./api/notes.js";
 import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
 import { flagOverdueFn } from "./functions/flag_overdue.js";
@@ -82,6 +82,7 @@ const app = workspace("tool-lending-app")
     checkoutLoanQuery,
     returnLoanQuery,
     memberLoansQuery,
+    membersQuery,
   ])
   .registerWorkflowTests([
     loanRequestTest,

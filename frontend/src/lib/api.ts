@@ -19,7 +19,7 @@ import type { InferResponse } from "@xano/sdk";
 import type { loansQuery } from "../../../xano/api/admin_loans.js";
 import type { itemQuery, itemsQuery } from "../../../xano/api/items.js";
 import type { myLoansQuery, requestLoanQuery } from "../../../xano/api/loans.js";
-import type { memberLoansQuery } from "../../../xano/api/members.js";
+import type { memberLoansQuery, membersQuery } from "../../../xano/api/members.js";
 import type { addNoteQuery } from "../../../xano/api/notes.js";
 import type {
   joinWaitlistQuery,
@@ -64,6 +64,7 @@ export async function listItems(filters: ItemFilters = {}): Promise<Item[]> {
   return res.json();
 }
 
+export type Member = InferResponse<typeof membersQuery>[number];
 export type ItemDetail = InferResponse<typeof itemQuery>;
 export type ConditionNote = InferResponse<typeof addNoteQuery>;
 export type Loan = InferResponse<typeof requestLoanQuery>;
@@ -220,4 +221,8 @@ export function itemWaitlist(id: number) {
     "GET items/{id}/waitlist",
     routePath("GET items/{id}/waitlist", { id }),
   );
+}
+
+export function listMembers() {
+  return request<Member[]>("GET members", routePath("GET members"));
 }
