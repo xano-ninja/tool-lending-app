@@ -24,6 +24,7 @@
     formatDate,
     formatTimestamp,
     holdUntil,
+    inLine,
     loanLabel,
     loanVariant,
     today,
@@ -252,6 +253,9 @@
               <Button variant="outline" class="w-full" disabled={busy} onclick={toggleWaitlist}>
                 {onWaitlist ? "Leave waitlist" : "Join waitlist"}
               </Button>
+              {#if myEntry && !heldUntil}
+                <p class="text-muted-foreground text-sm">You are {inLine(myEntry.ahead)}.</p>
+              {/if}
               {#if waitlistError}<p class="text-destructive text-sm">{waitlistError}</p>{/if}
             {/if}
           </Card.Content>

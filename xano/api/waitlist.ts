@@ -1,4 +1,4 @@
-import { query, input, inp, col, expr, s, ref, auth, c, guard } from "@xano/sdk";
+import { addon, query, input, inp, col, out, expr, s, ref, auth, c, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { notifyWaitlistFn } from "../functions/waitlist_notice.js";
 import { itemTable } from "../tables/item.js";
@@ -13,6 +13,17 @@ const mine = [
 const passTurn = s.conditional({
   when: expr(ref("entry.notified_at"), "!=", c.null()),
   then: [s.function.run({ fn: notifyWaitlistFn, input: { item_id: ref("entry.item_id") } })],
+});
+
+export const aheadInLineAddon = addon({
+  name: "waitlist_ahead",
+  table: waitlistTable,
+  input: { item_id: input.int(), created_at: input.timestamp() },
+  where: [
+    expr(col("item_id"), "=", inp("item_id")),
+    expr(col("created_at"), "<", inp("created_at")),
+  ],
+  cardinality: "count",
 });
 
 export const joinWaitlistQuery = query({
@@ -77,6 +88,13 @@ export const myWaitlistQuery = query({
         },
       ],
       eval: [{ name: "item_row.name", as: "item_name" }],
+      addon: [
+        {
+          addon: aheadInLineAddon,
+          as: "ahead",
+          input: { item_id: out("item_id"), created_at: out("created_at") },
+        },
+      ],
       sort: [{ sortBy: "created_at", dir: "asc" }],
       as: "entries",
     }),

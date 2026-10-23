@@ -7,6 +7,7 @@
     formatDate,
     formatTimestamp,
     holdUntil,
+    inLine,
     isOverdue,
     loanLabel,
     loanVariant,
@@ -115,7 +116,7 @@
                   {#if held}
                     Held for you until {held}. <a href="/items/{entry.item_id}" class="underline">Request it</a>
                   {:else}
-                    since {formatTimestamp(entry.created_at)}
+                    {inLine(entry.ahead)} · since {formatTimestamp(entry.created_at)}
                   {/if}
                 </p>
               </div>

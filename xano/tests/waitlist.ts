@@ -1,5 +1,6 @@
-import { workflowTest, s, ref, c } from "@xano/sdk";
+import { workflowTest, s, ref, c, col, expr, out } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { aheadInLineAddon } from "../api/waitlist.js";
 import { expireHoldsFn, notifyWaitlistFn } from "../functions/waitlist_notice.js";
 import { itemTable } from "../tables/item.js";
 import { loanTable } from "../tables/loan.js";
@@ -125,5 +126,33 @@ export const expireFreshTest = workflowTest({
     s.expect.to_not_be_null({ expr: ref("first_after") }),
     reread("second"),
     s.expect.to_be_null({ expr: ref("second_after.notified_at") }),
+  ],
+});
+
+const position = (as: string) =>
+  s.db.query({
+    table: waitlistTable,
+    where: expr(col("id"), "=", ref(`${as}_entry.id`)),
+    addon: [
+      {
+        addon: aheadInLineAddon,
+        as: "ahead",
+        input: { item_id: out("item_id"), created_at: out("created_at") },
+      },
+    ],
+    returnType: "single",
+    as: `${as}_position`,
+  });
+
+export const aheadInLineTest = workflowTest({
+  name: "waitlist position counts only earlier entries",
+  stack: [
+    ...fixtures(),
+    entry("first", 1000),
+    entry("second", 2000),
+    position("first"),
+    s.expect.to_equal({ expr: ref("first_position.ahead"), value: c.int(0) }),
+    position("second"),
+    s.expect.to_equal({ expr: ref("second_position.ahead"), value: c.int(1) }),
   ],
 });
