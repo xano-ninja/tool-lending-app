@@ -1,6 +1,6 @@
 import { addon, query, input, inp, col, out, expr, s, ref, auth, c, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { notifyWaitlistFn } from "../functions/waitlist_notice.js";
+import { notifyWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
 import { itemTable } from "../tables/item.js";
 import { waitlistTable } from "../tables/waitlist.js";
 import { api } from "./group.js";
@@ -137,10 +137,7 @@ export const removeWaitlistEntryQuery = query({
   input: { id: input.int({ required: true }) },
   stack: [
     ...guard.role(userTable, "admin"),
-    s.db.get({ table: waitlistTable, fieldValue: inp("id"), as: "entry" }),
-    guard.found("entry", { message: "Waitlist entry not found." }),
-    s.db.del({ table: waitlistTable, fieldValue: inp("id") }),
-    passTurn,
+    s.function.run({ fn: removeWaitlistEntryFn, input: { entry_id: inp("id") }, as: "result" }),
   ],
-  response: { id: inp("id"), removed: c.bool(true) },
+  response: ref("result"),
 });

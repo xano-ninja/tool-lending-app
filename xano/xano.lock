@@ -50,6 +50,9 @@
     "function:notify_waitlist": {
       "guid": "1baed7e0edab367ca3c55ba59be8ab87"
     },
+    "function:remove_waitlist_entry": {
+      "guid": "a4a76eb07f0363d30d348e49a973dd1a"
+    },
     "function:request_loan": {
       "guid": "89e63f5a97c8dbdd68a420833af211cd"
     },
@@ -169,6 +172,12 @@
     },
     "workflow_test:overdue job flags only loans out past due": {
       "guid": "209be9f156db65823005fafc1f4cc99c"
+    },
+    "workflow_test:removing a held entry passes the item on": {
+      "guid": "5b9ee2bf087fcc9521a0fd4230de40d3"
+    },
+    "workflow_test:removing an unknown waitlist entry is refused": {
+      "guid": "41547efb4d8451ec2c652c4a2bc6be81"
     },
     "workflow_test:return frees the item and notifies the waitlist": {
       "guid": "14edc07a8d624ff32e52c9ad8685a824"

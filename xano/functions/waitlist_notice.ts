@@ -120,3 +120,19 @@ export const expireHoldsFn = defineFunction({
   ],
   response: { expired: withFilters(ref("lapsed"), fl.count()) },
 });
+
+export const removeWaitlistEntryFn = defineFunction({
+  name: "remove_waitlist_entry",
+  description: "Remove a waitlist entry and pass a held item to the next member.",
+  input: { entry_id: input.int({ required: true }) },
+  stack: [
+    s.db.get({ table: waitlistTable, fieldValue: inp("entry_id"), as: "entry" }),
+    guard.found("entry", { message: "Waitlist entry not found." }),
+    s.db.del({ table: waitlistTable, fieldValue: inp("entry_id") }),
+    s.conditional({
+      when: expr(ref("entry.notified_at"), "!=", c.null()),
+      then: [s.function.run({ fn: notifyWaitlistFn, input: { item_id: ref("entry.item_id") } })],
+    }),
+  ],
+  response: { id: inp("entry_id"), removed: c.bool(true) },
+});

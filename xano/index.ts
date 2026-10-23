@@ -16,7 +16,7 @@ import { aheadInLineAddon, joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuer
 import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { requestLoanFn } from "./functions/request_loan.js";
-import { expireHoldsFn, notifyWaitlistFn } from "./functions/waitlist_notice.js";
+import { expireHoldsFn, notifyWaitlistFn, removeWaitlistEntryFn } from "./functions/waitlist_notice.js";
 import { conditionNoteTable } from "./tables/condition_note.js";
 import { itemTable } from "./tables/item.js";
 import { loanTable } from "./tables/loan.js";
@@ -44,6 +44,8 @@ import { overdueTest } from "./tests/overdue.js";
 import {
   aheadInLineTest,
   expireFreshTest,
+  removeHeldTest,
+  removeMissingTest,
   expireHoldTest,
   holdFirstTest,
   holdPromisedTest,
@@ -63,6 +65,7 @@ const app = workspace("tool-lending-app")
     flagOverdueFn,
     notifyWaitlistFn,
     expireHoldsFn,
+    removeWaitlistEntryFn,
   ])
   .registerTasks([overdueTask, waitlistTask])
   .registerQueries([
@@ -108,6 +111,8 @@ const app = workspace("tool-lending-app")
     expireHoldTest,
     expireFreshTest,
     aheadInLineTest,
+    removeHeldTest,
+    removeMissingTest,
   ]);
 
 export default registerAuth(app, { canonical: "authn" });

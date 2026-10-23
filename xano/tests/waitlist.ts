@@ -1,7 +1,7 @@
 import { workflowTest, s, ref, c, col, expr, out } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { aheadInLineAddon } from "../api/waitlist.js";
-import { expireHoldsFn, notifyWaitlistFn } from "../functions/waitlist_notice.js";
+import { expireHoldsFn, notifyWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
 import { itemTable } from "../tables/item.js";
 import { loanTable } from "../tables/loan.js";
 import { waitlistTable } from "../tables/waitlist.js";
@@ -154,5 +154,29 @@ export const aheadInLineTest = workflowTest({
     s.expect.to_equal({ expr: ref("first_position.ahead"), value: c.int(0) }),
     position("second"),
     s.expect.to_equal({ expr: ref("second_position.ahead"), value: c.int(1) }),
+  ],
+});
+
+export const removeHeldTest = workflowTest({
+  name: "removing a held entry passes the item on",
+  stack: [
+    ...fixtures(),
+    entry("first", 1000, "now"),
+    entry("second", 2000),
+    s.function.run({ fn: removeWaitlistEntryFn, input: { entry_id: ref("first_entry.id") } }),
+    reread("first"),
+    s.expect.to_be_null({ expr: ref("first_after") }),
+    reread("second"),
+    s.expect.to_not_be_null({ expr: ref("second_after.notified_at") }),
+  ],
+});
+
+export const removeMissingTest = workflowTest({
+  name: "removing an unknown waitlist entry is refused",
+  stack: [
+    s.expect.to_throw({
+      body: [s.function.run({ fn: removeWaitlistEntryFn, input: { entry_id: c.int(999999) } })],
+      exception: c.text("Waitlist entry not found"),
+    }),
   ],
 });
