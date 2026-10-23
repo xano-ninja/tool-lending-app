@@ -66,3 +66,7 @@ export function errorMessage(e: unknown, fallback: string): string {
   }
   return e.message || fallback;
 }
+
+export function inLine(ahead: number) {
+  return ahead === 0 ? "next in line" : `number ${ahead + 1} in line`;
+}

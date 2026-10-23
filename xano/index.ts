@@ -12,7 +12,7 @@ import { createItemQuery, itemQuery, itemsQuery, updateItemQuery } from "./api/i
 import { myLoansQuery, requestLoanQuery } from "./api/loans.js";
 import { memberLoansQuery, membersQuery } from "./api/members.js";
 import { addNoteQuery } from "./api/notes.js";
-import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
+import { aheadInLineAddon, joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
 import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { requestLoanFn } from "./functions/request_loan.js";
@@ -42,6 +42,7 @@ import {
 } from "./tests/loans.js";
 import { overdueTest } from "./tests/overdue.js";
 import {
+  aheadInLineTest,
   expireFreshTest,
   expireHoldTest,
   holdFirstTest,
@@ -53,6 +54,7 @@ import {
 const app = workspace("tool-lending-app")
   .registerTables([itemTable, loanTable, waitlistTable, conditionNoteTable])
   .registerApiGroups([api])
+  .registerAddons([aheadInLineAddon])
   .registerFunctions([
     requestLoanFn,
     transitionLoanFn,
@@ -105,6 +107,7 @@ const app = workspace("tool-lending-app")
     holdPromisedTest,
     expireHoldTest,
     expireFreshTest,
+    aheadInLineTest,
   ]);
 
 export default registerAuth(app, { canonical: "authn" });

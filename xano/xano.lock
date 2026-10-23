@@ -1,6 +1,9 @@
 {
   "version": 1,
   "objects": {
+    "addon:waitlist_ahead": {
+      "guid": "0cedfc1afe9dc664307ac0ec8e9e25c8"
+    },
     "app:Authentication": {
       "guid": "418bb3d99f5c721ab78c30d97d651e90",
       "canonical": "authn",
@@ -187,6 +190,9 @@
     },
     "workflow_test:waitlist notice skips an item with an approved loan": {
       "guid": "449a892498a8d4a257497fc14162bd6b"
+    },
+    "workflow_test:waitlist position counts only earlier entries": {
+      "guid": "b0fb4589ee99e47da10854c3e78bf790"
     }
   }
 }
