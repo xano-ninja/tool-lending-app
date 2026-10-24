@@ -1,6 +1,6 @@
 import { addon, query, input, inp, col, out, expr, s, ref, auth, c, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { notifyWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
+import { removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
 import { itemTable } from "../tables/item.js";
 import { waitlistTable } from "../tables/waitlist.js";
 import { api } from "./group.js";
@@ -9,11 +9,6 @@ const mine = [
   expr(col("item_id"), "=", inp("id")),
   expr(col("user_id"), "=", auth("id")),
 ];
-
-const passTurn = s.conditional({
-  when: expr(ref("entry.notified_at"), "!=", c.null()),
-  then: [s.function.run({ fn: notifyWaitlistFn, input: { item_id: ref("entry.item_id") } })],
-});
 
 export const aheadInLineAddon = addon({
   name: "waitlist_ahead",
@@ -64,8 +59,7 @@ export const leaveWaitlistQuery = query({
   stack: [
     s.db.query({ table: waitlistTable, where: mine, returnType: "single", as: "entry" }),
     guard.found("entry", { message: "You are not on the waitlist." }),
-    s.db.del({ table: waitlistTable, fieldValue: ref("entry.id") }),
-    passTurn,
+    s.function.run({ fn: removeWaitlistEntryFn, input: { entry_id: ref("entry.id") } }),
   ],
   response: { item_id: inp("id"), removed: c.bool(true) },
 });
