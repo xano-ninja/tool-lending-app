@@ -107,6 +107,25 @@ export const expireHoldsFn = defineFunction({
         expr(col("notified_at"), "!=", c.null()),
         expr(col("notified_at"), "<", ref("cutoff")),
       ],
+      bind: [
+        {
+          table: itemTable,
+          as: "item_row",
+          join: "left",
+          where: expr(col("item_id"), "=", col("item_row.id")),
+        },
+        {
+          table: userTable,
+          as: "user_row",
+          join: "left",
+          where: expr(col("user_id"), "=", col("user_row.id")),
+        },
+      ],
+      eval: [
+        { name: "item_row.name", as: "item_name" },
+        { name: "user_row.name", as: "user_name" },
+        { name: "user_row.email", as: "user_email" },
+      ],
       as: "lapsed",
     }),
     s.foreach({
@@ -114,6 +133,27 @@ export const expireHoldsFn = defineFunction({
       as: "entry",
       body: [
         s.db.del({ table: waitlistTable, fieldValue: ref("entry.id") }),
+        s.try_catch({
+          try: [
+            s.util.send_email({
+              service_provider: c.text("xano"),
+              to: ref("entry.user_email"),
+              subject: withFilters(c.text("Your hold on "), fl.concat(ref("entry.item_name")), fl.concat(c.text(" has expired"))),
+              message: withFilters(
+                c.text("Hi "),
+                fl.concat(ref("entry.user_name")),
+                fl.concat(c.text(", the ")),
+                fl.concat(ref("entry.item_name")),
+                fl.concat(
+                  c.text(
+                    ` was held for you for ${HOLD_DAYS} days and nobody requested it, so it has passed to the next person ` +
+                      "and you are off its waitlist. Join the waitlist again from the tool library if you still need it.",
+                  ),
+                ),
+              ),
+            }),
+          ],
+        }),
         s.function.run({ fn: notifyWaitlistFn, input: { item_id: ref("entry.item_id") }, as: "notice" }),
       ],
     }),

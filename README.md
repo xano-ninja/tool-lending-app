@@ -19,7 +19,7 @@ else on the waitlist is notified while a hold is open or while a loan for the
 item is approved. Requesting a loan takes the member off the waitlist. If the
 holder leaves the waitlist or an admin removes them, the next member is
 notified at once; if they do nothing, `nightly_waitlist` (03:15 UTC) drops
-the lapsed hold and moves on.
+the lapsed hold, emails them that it expired, and moves on.
 
 Emails go through Xano's built-in mailer, and a failed send does not fail the
 request that triggered it or the nightly run.
