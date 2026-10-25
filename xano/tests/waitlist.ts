@@ -115,6 +115,36 @@ export const expireHoldTest = workflowTest({
   ],
 });
 
+export const expireManyTest = workflowTest({
+  name: "every lapsed hold in a run is passed on",
+  stack: [
+    ...fixtures(),
+    s.db.add({
+      table: itemTable,
+      row: { name: "Test ladder", category: "ladders", status: "available" },
+      as: "ladder",
+    }),
+    entry("first", 1000, LONG_AGO),
+    entry("second", 2000),
+    s.db.add({
+      table: waitlistTable,
+      row: { item_id: ref("ladder.id"), user_id: ref("second.id"), created_at: 1000, notified_at: LONG_AGO },
+      as: "ladder_entry",
+    }),
+    s.db.add({
+      table: waitlistTable,
+      row: { item_id: ref("ladder.id"), user_id: ref("first.id"), created_at: 2000 },
+      as: "ladder_next_entry",
+    }),
+    s.function.run({ fn: expireHoldsFn, as: "result" }),
+    s.expect.to_equal({ expr: ref("result.expired"), value: c.int(2) }),
+    reread("second"),
+    s.expect.to_not_be_null({ expr: ref("second_after.notified_at") }),
+    reread("ladder_next"),
+    s.expect.to_not_be_null({ expr: ref("ladder_next_after.notified_at") }),
+  ],
+});
+
 export const expireFreshTest = workflowTest({
   name: "a hold inside its window is kept",
   stack: [

@@ -149,6 +149,9 @@
     "workflow_test:checkout refuses an item in repair": {
       "guid": "c208befb2b716abb6c3df9820e91305a"
     },
+    "workflow_test:every lapsed hold in a run is passed on": {
+      "guid": "7a3bec0c52d72c1d2574ddb07ecc0030"
+    },
     "workflow_test:lapsed hold passes the item to the next in line": {
       "guid": "a900b4fa39fba97085dd0754d3e380f7"
     },
