@@ -44,6 +44,7 @@ import { overdueTest } from "./tests/overdue.js";
 import {
   aheadInLineTest,
   expireFreshTest,
+  expireManyTest,
   removeHeldTest,
   removeMissingTest,
   expireHoldTest,
@@ -110,6 +111,7 @@ const app = workspace("tool-lending-app")
     holdPromisedTest,
     expireHoldTest,
     expireFreshTest,
+    expireManyTest,
     aheadInLineTest,
     removeHeldTest,
     removeMissingTest,
