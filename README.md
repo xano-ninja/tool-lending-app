@@ -7,7 +7,8 @@ approve loans, mark returns and log condition notes.
 Built so far: email sign-in, the catalog, an item page where members request
 a loan, join the waitlist and read the loan history and condition notes, a My
 loans page, and admin pages for approving, rejecting, checking out and returning
-loans, for a member's loan history, and for adding and editing items.
+loans, for a member's loans and waitlist entries, and for adding and editing
+items.
 
 A nightly task (`nightly_overdue`, 03:00 UTC) flags loans that are out past
 their due date and emails the borrower.
@@ -25,7 +26,10 @@ Emails go through Xano's built-in mailer, and a failed send does not fail the
 request that triggered it or the nightly run.
 
 `npm run xano:test` runs the workflow tests in `xano/tests/` against the
-deployed backend.
+deployed backend. A workflow test cannot call an endpoint as a signed-in
+member, so each endpoint's work lives in a function under `xano/functions/`
+that takes the member or item id, and the tests call those functions. The
+endpoints only check the caller's role and pass the id along.
 
 The backend under [`xano/`](xano/) is TypeScript on the [Xano SDK](https://github.com/xano-sdk/sdk).
 The SvelteKit frontend under [`frontend/`](frontend/) takes its request paths and
