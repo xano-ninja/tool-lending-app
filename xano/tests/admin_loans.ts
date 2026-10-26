@@ -1,5 +1,6 @@
 import { workflowTest, s, ref, c } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { listLoansFn } from "../functions/list_loans.js";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
 import { itemTable } from "../tables/item.js";
 import { loanTable } from "../tables/loan.js";
@@ -126,5 +127,56 @@ export const returnTwiceTest = workflowTest({
       ],
       exception: c.text("not checked out"),
     }),
+  ],
+});
+
+const listed = (as: string, status: LoanStatus, due: string) =>
+  s.db.add({
+    table: loanTable,
+    row: {
+      item_id: ref("item.id"),
+      user_id: ref("member.id"),
+      start_date: "2020-01-01",
+      due_date: due,
+      status,
+    },
+    as,
+  });
+
+const loanList = [
+  member("member", "member@example.com"),
+  s.db.add({
+    table: itemTable,
+    row: { name: "Test ladder", category: "ladders", status: "on_loan" },
+    as: "item",
+  }),
+  listed("late", "out", "2020-01-08"),
+  listed("on_time", "out", "2099-01-08"),
+  listed("back", "returned", "2020-01-08"),
+  listed("asked", "requested", "2020-01-08"),
+];
+
+export const listOverdueTest = workflowTest({
+  name: "overdue list holds only loans out past due",
+  stack: [
+    ...loanList,
+    s.function.run({ fn: listLoansFn, input: { status: c.text("overdue") }, as: "loans" }),
+    s.expect.to_equal({ expr: ref("loans.0.id"), value: ref("late.id") }),
+    s.expect.to_equal({ expr: ref("loans.0.item_name"), value: c.text("Test ladder") }),
+    s.expect.to_equal({ expr: ref("loans.0.user_name"), value: c.text("member") }),
+    s.expect.to_not_be_defined({ expr: ref("loans.1") }),
+  ],
+});
+
+export const listStatusTest = workflowTest({
+  name: "loan list filters by status, soonest due first",
+  stack: [
+    ...loanList,
+    s.function.run({ fn: listLoansFn, input: { status: c.text("out") }, as: "out" }),
+    s.expect.to_equal({ expr: ref("out.0.id"), value: ref("late.id") }),
+    s.expect.to_equal({ expr: ref("out.1.id"), value: ref("on_time.id") }),
+    s.expect.to_not_be_defined({ expr: ref("out.2") }),
+    s.function.run({ fn: listLoansFn, as: "all" }),
+    s.expect.to_be_defined({ expr: ref("all.3") }),
   ],
 });

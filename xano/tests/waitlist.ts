@@ -1,7 +1,7 @@
-import { workflowTest, s, ref, c, col, expr, out } from "@xano/sdk";
+import { workflowTest, s, ref, c } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { aheadInLineAddon } from "../api/waitlist.js";
 import { expireHoldsFn, notifyWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
+import { itemWaitlistFn, memberWaitlistFn } from "../functions/waitlist_queue.js";
 import { itemTable } from "../tables/item.js";
 import { loanTable } from "../tables/loan.js";
 import { waitlistTable } from "../tables/waitlist.js";
@@ -159,20 +159,8 @@ export const expireFreshTest = workflowTest({
   ],
 });
 
-const position = (as: string) =>
-  s.db.query({
-    table: waitlistTable,
-    where: expr(col("id"), "=", ref(`${as}_entry.id`)),
-    addon: [
-      {
-        addon: aheadInLineAddon,
-        as: "ahead",
-        input: { item_id: out("item_id"), created_at: out("created_at") },
-      },
-    ],
-    returnType: "single",
-    as: `${as}_position`,
-  });
+const queue = (as: string) =>
+  s.function.run({ fn: memberWaitlistFn, input: { user_id: ref(`${as}.id`) }, as: `${as}_queue` });
 
 export const aheadInLineTest = workflowTest({
   name: "waitlist position counts only earlier entries",
@@ -180,10 +168,33 @@ export const aheadInLineTest = workflowTest({
     ...fixtures(),
     entry("first", 1000),
     entry("second", 2000),
-    position("first"),
-    s.expect.to_equal({ expr: ref("first_position.ahead"), value: c.int(0) }),
-    position("second"),
-    s.expect.to_equal({ expr: ref("second_position.ahead"), value: c.int(1) }),
+    queue("first"),
+    s.expect.to_equal({ expr: ref("first_queue.0.ahead"), value: c.int(0) }),
+    queue("second"),
+    s.expect.to_equal({ expr: ref("second_queue.0.ahead"), value: c.int(1) }),
+    s.expect.to_equal({ expr: ref("second_queue.0.item_name"), value: c.text("Test sander") }),
+  ],
+});
+
+export const itemQueueTest = workflowTest({
+  name: "item waitlist lists members in the order they joined",
+  stack: [
+    ...fixtures(),
+    s.db.add({
+      table: itemTable,
+      row: { name: "Test ladder", category: "ladders", status: "available" },
+      as: "ladder",
+    }),
+    entry("first", 2000),
+    entry("second", 1000),
+    s.db.add({
+      table: waitlistTable,
+      row: { item_id: ref("ladder.id"), user_id: ref("first.id"), created_at: 500 },
+    }),
+    s.function.run({ fn: itemWaitlistFn, input: { item_id: ref("item.id") }, as: "line" }),
+    s.expect.to_equal({ expr: ref("line.0.user_name"), value: c.text("second") }),
+    s.expect.to_equal({ expr: ref("line.1.user_name"), value: c.text("first") }),
+    s.expect.to_not_be_defined({ expr: ref("line.2") }),
   ],
 });
 

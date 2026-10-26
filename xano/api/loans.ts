@@ -1,8 +1,7 @@
-import { query, input, inp, col, expr, s, ref, auth } from "@xano/sdk";
+import { query, input, inp, s, ref, auth } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { memberLoansFn } from "../functions/members.js";
 import { requestLoanFn } from "../functions/request_loan.js";
-import { itemTable } from "../tables/item.js";
-import { loanTable } from "../tables/loan.js";
 import { api } from "./group.js";
 
 export const requestLoanQuery = query({
@@ -35,22 +34,6 @@ export const myLoansQuery = query({
   verb: "GET",
   apiGroup: api,
   auth: userTable,
-  stack: [
-    s.db.query({
-      table: loanTable,
-      where: expr(col("user_id"), "=", auth("id")),
-      bind: [
-        {
-          table: itemTable,
-          as: "item_row",
-          join: "left",
-          where: expr(col("item_id"), "=", col("item_row.id")),
-        },
-      ],
-      eval: [{ name: "item_row.name", as: "item_name" }],
-      sort: [{ sortBy: "start_date", dir: "desc" }],
-      as: "loans",
-    }),
-  ],
+  stack: [s.function.run({ fn: memberLoansFn, input: { user_id: auth("id") }, as: "loans" })],
   response: ref("loans"),
 });
