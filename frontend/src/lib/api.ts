@@ -85,8 +85,9 @@ export type AdminLoan = Omit<InferResponse<typeof loansQuery>[number], "item_nam
   user_name: string | null;
 };
 type MemberLoansResponse = InferResponse<typeof memberLoansQuery>;
-export type MemberLoans = Omit<MemberLoansResponse, "loans"> & {
+export type MemberLoans = Omit<MemberLoansResponse, "loans" | "waitlist"> & {
   loans: (Omit<MemberLoansResponse["loans"][number], "item_name"> & { item_name: string | null })[];
+  waitlist: (Omit<MemberLoansResponse["waitlist"][number], "item_name"> & { item_name: string | null })[];
 };
 export type ItemInput = RouteInputs["POST items"];
 export type Credentials = RouteInputs["POST auth/login"];

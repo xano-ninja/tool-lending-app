@@ -12,11 +12,14 @@ import { createItemQuery, itemQuery, itemsQuery, updateItemQuery } from "./api/i
 import { myLoansQuery, requestLoanQuery } from "./api/loans.js";
 import { memberLoansQuery, membersQuery } from "./api/members.js";
 import { addNoteQuery } from "./api/notes.js";
-import { aheadInLineAddon, joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
+import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
 import { flagOverdueFn } from "./functions/flag_overdue.js";
+import { listLoansFn } from "./functions/list_loans.js";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
+import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { requestLoanFn } from "./functions/request_loan.js";
 import { expireHoldsFn, notifyWaitlistFn, removeWaitlistEntryFn } from "./functions/waitlist_notice.js";
+import { aheadInLineAddon, itemWaitlistFn, memberWaitlistFn } from "./functions/waitlist_queue.js";
 import { conditionNoteTable } from "./tables/condition_note.js";
 import { itemTable } from "./tables/item.js";
 import { loanTable } from "./tables/loan.js";
@@ -28,6 +31,8 @@ import {
   approveTwiceTest,
   checkoutRepairTest,
   checkoutTest,
+  listOverdueTest,
+  listStatusTest,
   returnNoWaitlistTest,
   returnTest,
   returnTwiceTest,
@@ -40,6 +45,7 @@ import {
   loanRetiredTest,
   loanWaitlistTest,
 } from "./tests/loans.js";
+import { memberLoansTest, memberMissingTest, membersSortedTest, memberWaitlistTest } from "./tests/members.js";
 import { overdueTest } from "./tests/overdue.js";
 import {
   aheadInLineTest,
@@ -52,6 +58,7 @@ import {
   holdPromisedTest,
   holdRepairTest,
   holdTakenTest,
+  itemQueueTest,
 } from "./tests/waitlist.js";
 
 const app = workspace("tool-lending-app")
@@ -67,6 +74,12 @@ const app = workspace("tool-lending-app")
     notifyWaitlistFn,
     expireHoldsFn,
     removeWaitlistEntryFn,
+    memberWaitlistFn,
+    itemWaitlistFn,
+    listMembersFn,
+    memberLoansFn,
+    memberHistoryFn,
+    listLoansFn,
   ])
   .registerTasks([overdueTask, waitlistTask])
   .registerQueries([
@@ -104,6 +117,8 @@ const app = workspace("tool-lending-app")
     returnTest,
     returnNoWaitlistTest,
     returnTwiceTest,
+    listOverdueTest,
+    listStatusTest,
     overdueTest,
     holdFirstTest,
     holdTakenTest,
@@ -115,6 +130,11 @@ const app = workspace("tool-lending-app")
     aheadInLineTest,
     removeHeldTest,
     removeMissingTest,
+    itemQueueTest,
+    membersSortedTest,
+    memberLoansTest,
+    memberWaitlistTest,
+    memberMissingTest,
   ]);
 
 export default registerAuth(app, { canonical: "authn" });

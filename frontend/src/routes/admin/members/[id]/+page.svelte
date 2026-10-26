@@ -3,11 +3,13 @@
 
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { memberLoans, type MemberLoans } from "$lib/api";
+  import { memberLoans, removeWaitlistEntry, type MemberLoans } from "$lib/api";
   import {
     errorMessage,
     formatDate,
     formatTimestamp,
+    holdUntil,
+    inLine,
     isOverdue,
     loanLabel,
     loanVariant,
@@ -30,6 +32,16 @@
   );
   const past = $derived(loans.filter((l) => l.status === "returned" || l.status === "rejected"));
   const late = $derived(loans.filter((l) => l.overdue).length);
+  const waitlist = $derived(data?.waitlist ?? []);
+
+  async function remove(entryId: number) {
+    try {
+      await removeWaitlistEntry(entryId);
+      data = await memberLoans(id);
+    } catch (e) {
+      error = errorMessage(e, "Could not remove this entry.");
+    }
+  }
 
   $effect(() => {
     if (!isAdmin || !Number.isInteger(id)) return;
@@ -89,6 +101,33 @@
       {:else}
         <ul class="divide-y rounded-lg border">
           {#each current as loan (loan.id)}{@render loanRow(loan)}{/each}
+        </ul>
+      {/if}
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-lg font-medium">Waitlist</h2>
+      {#if waitlist.length === 0}
+        <p class="text-muted-foreground text-sm">Not waiting on any tools.</p>
+      {:else}
+        <ul class="divide-y rounded-lg border">
+          {#each waitlist as entry (entry.id)}
+            {@const held = holdUntil(entry.notified_at)}
+            <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+              <div class="space-y-0.5">
+                <a href="/admin/items/{entry.item_id}" class="font-medium hover:underline">
+                  {entry.item_name ?? `Item ${entry.item_id}`}
+                </a>
+                <p class="text-muted-foreground text-sm">
+                  {inLine(entry.ahead)} · since {formatTimestamp(entry.created_at)}
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                {#if held}<Badge variant="secondary">held until {held}</Badge>{/if}
+                <Button variant="ghost" size="sm" onclick={() => remove(entry.id)}>Remove</Button>
+              </div>
+            </li>
+          {/each}
         </ul>
       {/if}
     </section>

@@ -47,6 +47,24 @@
     "function:flag_overdue_loans": {
       "guid": "6cc57f41d2e0863b60c4b56973945c57"
     },
+    "function:item_waitlist": {
+      "guid": "838b4e1961a65b997facf65d76f3635e"
+    },
+    "function:list_loans": {
+      "guid": "a95b4dcb0d76ba615cabba3d7aaecc98"
+    },
+    "function:list_members": {
+      "guid": "d0991571c49315b8816e5666e564d63a"
+    },
+    "function:member_history": {
+      "guid": "eeb49833cf5bfb011d29f1278bb4476a"
+    },
+    "function:member_loans": {
+      "guid": "282e2e1e046f4bb1794068d9c917465b"
+    },
+    "function:member_waitlist": {
+      "guid": "39f96a95261bc50d9f28462d3465e9de"
+    },
     "function:notify_waitlist": {
       "guid": "1baed7e0edab367ca3c55ba59be8ab87"
     },
@@ -152,8 +170,14 @@
     "workflow_test:every lapsed hold in a run is passed on": {
       "guid": "7a3bec0c52d72c1d2574ddb07ecc0030"
     },
+    "workflow_test:item waitlist lists members in the order they joined": {
+      "guid": "40b274a83db08eb64af634fec3fb0cfb"
+    },
     "workflow_test:lapsed hold passes the item to the next in line": {
       "guid": "a900b4fa39fba97085dd0754d3e380f7"
+    },
+    "workflow_test:loan list filters by status, soonest due first": {
+      "guid": "05972e4db76bb90c1a64150be60e6432"
     },
     "workflow_test:loan request refuses a due date before the start": {
       "guid": "a88e0b0a5efa81822c7db96b08c32600"
@@ -173,8 +197,23 @@
     "workflow_test:loan request takes the member off the waitlist": {
       "guid": "99522ed5260bb552749b9d7b86ef1d27"
     },
+    "workflow_test:member history includes the member's waitlist": {
+      "guid": "eb3b27b134803175b0a0b76a3b67479d"
+    },
+    "workflow_test:member history lists only that member's loans, newest first": {
+      "guid": "5b55fcbdb61135bc4342bcef73f444c6"
+    },
+    "workflow_test:member history refuses an unknown member": {
+      "guid": "9bd6dbb2875c050f72b497953878c67c"
+    },
+    "workflow_test:members list is sorted by name without passwords": {
+      "guid": "83be1dfb5c9e7f73e94f62d30220ff0e"
+    },
     "workflow_test:overdue job flags only loans out past due": {
       "guid": "209be9f156db65823005fafc1f4cc99c"
+    },
+    "workflow_test:overdue list holds only loans out past due": {
+      "guid": "e9133e64f240ecdb4d41af8554313376"
     },
     "workflow_test:removing a held entry passes the item on": {
       "guid": "5b9ee2bf087fcc9521a0fd4230de40d3"

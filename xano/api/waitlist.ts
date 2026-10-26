@@ -1,6 +1,7 @@
-import { addon, query, input, inp, col, out, expr, s, ref, auth, c, guard } from "@xano/sdk";
+import { query, input, inp, col, expr, s, ref, auth, c, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
+import { itemWaitlistFn, memberWaitlistFn } from "../functions/waitlist_queue.js";
 import { itemTable } from "../tables/item.js";
 import { waitlistTable } from "../tables/waitlist.js";
 import { api } from "./group.js";
@@ -9,17 +10,6 @@ const mine = [
   expr(col("item_id"), "=", inp("id")),
   expr(col("user_id"), "=", auth("id")),
 ];
-
-export const aheadInLineAddon = addon({
-  name: "waitlist_ahead",
-  table: waitlistTable,
-  input: { item_id: input.int(), created_at: input.timestamp() },
-  where: [
-    expr(col("item_id"), "=", inp("item_id")),
-    expr(col("created_at"), "<", inp("created_at")),
-  ],
-  cardinality: "count",
-});
 
 export const joinWaitlistQuery = query({
   name: "items/{id}/waitlist",
@@ -69,30 +59,7 @@ export const myWaitlistQuery = query({
   verb: "GET",
   apiGroup: api,
   auth: userTable,
-  stack: [
-    s.db.query({
-      table: waitlistTable,
-      where: expr(col("user_id"), "=", auth("id")),
-      bind: [
-        {
-          table: itemTable,
-          as: "item_row",
-          join: "left",
-          where: expr(col("item_id"), "=", col("item_row.id")),
-        },
-      ],
-      eval: [{ name: "item_row.name", as: "item_name" }],
-      addon: [
-        {
-          addon: aheadInLineAddon,
-          as: "ahead",
-          input: { item_id: out("item_id"), created_at: out("created_at") },
-        },
-      ],
-      sort: [{ sortBy: "created_at", dir: "asc" }],
-      as: "entries",
-    }),
-  ],
+  stack: [s.function.run({ fn: memberWaitlistFn, input: { user_id: auth("id") }, as: "entries" })],
   response: ref("entries"),
 });
 
@@ -104,21 +71,7 @@ export const itemWaitlistQuery = query({
   input: { id: input.int({ required: true }) },
   stack: [
     ...guard.role(userTable, "admin"),
-    s.db.query({
-      table: waitlistTable,
-      where: expr(col("item_id"), "=", inp("id")),
-      bind: [
-        {
-          table: userTable,
-          as: "user_row",
-          join: "left",
-          where: expr(col("user_id"), "=", col("user_row.id")),
-        },
-      ],
-      eval: [{ name: "user_row.name", as: "user_name" }],
-      sort: [{ sortBy: "created_at", dir: "asc" }],
-      as: "entries",
-    }),
+    s.function.run({ fn: itemWaitlistFn, input: { item_id: inp("id") }, as: "entries" }),
   ],
   response: ref("entries"),
 });
