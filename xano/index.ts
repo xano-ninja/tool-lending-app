@@ -45,7 +45,7 @@ import {
   loanRetiredTest,
   loanWaitlistTest,
 } from "./tests/loans.js";
-import { memberLoansTest, memberMissingTest, membersSortedTest, memberWaitlistTest } from "./tests/members.js";
+import { memberEmptyHistoryTest, memberLoansTest, memberMissingTest, membersSortedTest, memberWaitlistTest } from "./tests/members.js";
 import { overdueTest } from "./tests/overdue.js";
 import {
   aheadInLineTest,
@@ -135,6 +135,7 @@ const app = workspace("tool-lending-app")
     memberLoansTest,
     memberWaitlistTest,
     memberMissingTest,
+    memberEmptyHistoryTest,
   ]);
 
 export default registerAuth(app, { canonical: "authn" });
