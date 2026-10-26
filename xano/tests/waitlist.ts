@@ -1,6 +1,6 @@
 import { workflowTest, s, ref, c } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { expireHoldsFn, notifyWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
+import { expireHoldsFn, leaveWaitlistFn, notifyWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
 import { itemWaitlistFn, memberWaitlistFn } from "../functions/waitlist_queue.js";
 import { itemTable } from "../tables/item.js";
 import { loanTable } from "../tables/loan.js";
@@ -218,6 +218,34 @@ export const removeMissingTest = workflowTest({
     s.expect.to_throw({
       body: [s.function.run({ fn: removeWaitlistEntryFn, input: { entry_id: c.int(999999) } })],
       exception: c.text("Waitlist entry not found"),
+    }),
+  ],
+});
+
+export const leaveHeldTest = workflowTest({
+  name: "leaving with a hold passes the item on",
+  stack: [
+    ...fixtures(),
+    entry("first", 1000, "now"),
+    entry("second", 2000),
+    s.function.run({ fn: leaveWaitlistFn, input: { item_id: ref("item.id"), user_id: ref("first.id") } }),
+    reread("first"),
+    s.expect.to_be_null({ expr: ref("first_after") }),
+    reread("second"),
+    s.expect.to_not_be_null({ expr: ref("second_after.notified_at") }),
+  ],
+});
+
+export const leaveNotWaitingTest = workflowTest({
+  name: "leaving a waitlist you are not on is refused",
+  stack: [
+    s.expect.to_throw({
+      body: [
+        ...fixtures(),
+        entry("first", 1000),
+        s.function.run({ fn: leaveWaitlistFn, input: { item_id: ref("item.id"), user_id: ref("second.id") } }),
+      ],
+      exception: c.text("You are not on the waitlist"),
     }),
   ],
 });

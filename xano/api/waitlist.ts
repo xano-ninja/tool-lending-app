@@ -1,6 +1,6 @@
 import { query, input, inp, col, expr, s, ref, auth, c, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
+import { leaveWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
 import { itemWaitlistFn, memberWaitlistFn } from "../functions/waitlist_queue.js";
 import { itemTable } from "../tables/item.js";
 import { waitlistTable } from "../tables/waitlist.js";
@@ -47,11 +47,13 @@ export const leaveWaitlistQuery = query({
   auth: userTable,
   input: { id: input.int({ required: true }) },
   stack: [
-    s.db.query({ table: waitlistTable, where: mine, returnType: "single", as: "entry" }),
-    guard.found("entry", { message: "You are not on the waitlist." }),
-    s.function.run({ fn: removeWaitlistEntryFn, input: { entry_id: ref("entry.id") } }),
+    s.function.run({
+      fn: leaveWaitlistFn,
+      input: { item_id: inp("id"), user_id: auth("id") },
+      as: "result",
+    }),
   ],
-  response: { item_id: inp("id"), removed: c.bool(true) },
+  response: ref("result"),
 });
 
 export const myWaitlistQuery = query({
