@@ -176,3 +176,20 @@ export const removeWaitlistEntryFn = defineFunction({
   ],
   response: { id: inp("entry_id"), removed: c.bool(true) },
 });
+
+export const leaveWaitlistFn = defineFunction({
+  name: "leave_waitlist",
+  description: "Take a member off an item's waitlist.",
+  input: { item_id: input.int({ required: true }), user_id: input.int({ required: true }) },
+  stack: [
+    s.db.query({
+      table: waitlistTable,
+      where: [expr(col("item_id"), "=", inp("item_id")), expr(col("user_id"), "=", inp("user_id"))],
+      returnType: "single",
+      as: "entry",
+    }),
+    guard.found("entry", { message: "You are not on the waitlist." }),
+    s.function.run({ fn: removeWaitlistEntryFn, input: { entry_id: ref("entry.id") } }),
+  ],
+  response: { item_id: inp("item_id"), removed: c.bool(true) },
+});

@@ -18,7 +18,7 @@ import { listLoansFn } from "./functions/list_loans.js";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { requestLoanFn } from "./functions/request_loan.js";
-import { expireHoldsFn, notifyWaitlistFn, removeWaitlistEntryFn } from "./functions/waitlist_notice.js";
+import { expireHoldsFn, leaveWaitlistFn, notifyWaitlistFn, removeWaitlistEntryFn } from "./functions/waitlist_notice.js";
 import { aheadInLineAddon, itemWaitlistFn, memberWaitlistFn } from "./functions/waitlist_queue.js";
 import { conditionNoteTable } from "./tables/condition_note.js";
 import { itemTable } from "./tables/item.js";
@@ -53,6 +53,8 @@ import {
   expireManyTest,
   removeHeldTest,
   removeMissingTest,
+  leaveHeldTest,
+  leaveNotWaitingTest,
   expireHoldTest,
   holdFirstTest,
   holdPromisedTest,
@@ -74,6 +76,7 @@ const app = workspace("tool-lending-app")
     notifyWaitlistFn,
     expireHoldsFn,
     removeWaitlistEntryFn,
+    leaveWaitlistFn,
     memberWaitlistFn,
     itemWaitlistFn,
     listMembersFn,
@@ -130,6 +133,8 @@ const app = workspace("tool-lending-app")
     aheadInLineTest,
     removeHeldTest,
     removeMissingTest,
+    leaveHeldTest,
+    leaveNotWaitingTest,
     itemQueueTest,
     membersSortedTest,
     memberLoansTest,

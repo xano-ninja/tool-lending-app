@@ -50,6 +50,9 @@
     "function:item_waitlist": {
       "guid": "838b4e1961a65b997facf65d76f3635e"
     },
+    "function:leave_waitlist": {
+      "guid": "3d8fc7dc3b03f9e1f34fe8c7317aa11f"
+    },
     "function:list_loans": {
       "guid": "a95b4dcb0d76ba615cabba3d7aaecc98"
     },
@@ -175,6 +178,12 @@
     },
     "workflow_test:lapsed hold passes the item to the next in line": {
       "guid": "a900b4fa39fba97085dd0754d3e380f7"
+    },
+    "workflow_test:leaving a waitlist you are not on is refused": {
+      "guid": "54719a8f55bcea8b57b2b89df5ad24a8"
+    },
+    "workflow_test:leaving with a hold passes the item on": {
+      "guid": "1296bb5878da0c9858857f3e8c584d66"
     },
     "workflow_test:loan list filters by status, soonest due first": {
       "guid": "05972e4db76bb90c1a64150be60e6432"
