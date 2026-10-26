@@ -96,3 +96,15 @@ export const memberMissingTest = workflowTest({
     }),
   ],
 });
+
+export const memberEmptyHistoryTest = workflowTest({
+  name: "member history is empty for a member with no activity",
+  stack: [
+    ...fixtures,
+    loan("other", "adam", "2026-02-01", "2026-02-08"),
+    history("zoe"),
+    s.expect.to_equal({ expr: ref("history.member.id"), value: ref("zoe.id") }),
+    s.expect.to_be_empty({ expr: ref("history.loans") }),
+    s.expect.to_be_empty({ expr: ref("history.waitlist") }),
+  ],
+});

@@ -200,6 +200,9 @@
     "workflow_test:member history includes the member's waitlist": {
       "guid": "eb3b27b134803175b0a0b76a3b67479d"
     },
+    "workflow_test:member history is empty for a member with no activity": {
+      "guid": "86bb93663b309e572bbdf715ef2058cd"
+    },
     "workflow_test:member history lists only that member's loans, newest first": {
       "guid": "5b55fcbdb61135bc4342bcef73f444c6"
     },
