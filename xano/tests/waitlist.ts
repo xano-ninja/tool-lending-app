@@ -1,6 +1,6 @@
 import { workflowTest, s, ref, c } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { expireHoldsFn, leaveWaitlistFn, notifyWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
+import { expireHoldsFn, joinWaitlistFn, leaveWaitlistFn, notifyWaitlistFn, removeWaitlistEntryFn } from "../functions/waitlist_notice.js";
 import { itemWaitlistFn, memberWaitlistFn } from "../functions/waitlist_queue.js";
 import { itemTable } from "../tables/item.js";
 import { loanTable } from "../tables/loan.js";
@@ -27,7 +27,7 @@ const entry = (as: string, joined: number, notified: "now" | number | null = nul
     as: `${as}_entry`,
   });
 
-const fixtures = (status: "available" | "in_repair" = "available") => [
+const fixtures = (status: "available" | "in_repair" | "retired" = "available") => [
   s.db.add({
     table: itemTable,
     row: { name: "Test sander", category: "power tools", status },
@@ -246,6 +246,42 @@ export const leaveNotWaitingTest = workflowTest({
         s.function.run({ fn: leaveWaitlistFn, input: { item_id: ref("item.id"), user_id: ref("second.id") } }),
       ],
       exception: c.text("You are not on the waitlist"),
+    }),
+  ],
+});
+
+const join = (as: string) =>
+  s.function.run({ fn: joinWaitlistFn, input: { item_id: ref("item.id"), user_id: ref(`${as}.id`) }, as: `${as}_joined` });
+
+export const joinTest = workflowTest({
+  name: "joining puts the member at the back of the line",
+  stack: [
+    ...fixtures(),
+    entry("first", 1000),
+    join("second"),
+    s.expect.to_equal({ expr: ref("second_joined.user_id"), value: ref("second.id") }),
+    s.expect.to_be_null({ expr: ref("second_joined.notified_at") }),
+    s.function.run({ fn: memberWaitlistFn, input: { user_id: ref("second.id") }, as: "second_queue" }),
+    s.expect.to_equal({ expr: ref("second_queue.0.ahead"), value: c.int(1) }),
+  ],
+});
+
+export const joinTwiceTest = workflowTest({
+  name: "joining a waitlist twice is refused",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures(), entry("first", 1000), join("first")],
+      exception: c.text("You are already on the waitlist"),
+    }),
+  ],
+});
+
+export const joinRetiredTest = workflowTest({
+  name: "joining the waitlist of a retired item is refused",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures("retired"), join("first")],
+      exception: c.text("This item is retired"),
     }),
   ],
 });
