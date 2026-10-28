@@ -193,3 +193,35 @@ export const leaveWaitlistFn = defineFunction({
   ],
   response: { item_id: inp("item_id"), removed: c.bool(true) },
 });
+
+export const joinWaitlistFn = defineFunction({
+  name: "join_waitlist",
+  description: "Put a member at the back of an item's waitlist.",
+  input: { item_id: input.int({ required: true }), user_id: input.int({ required: true }) },
+  stack: [
+    s.db.get({ table: itemTable, fieldValue: inp("item_id"), as: "item" }),
+    guard.found("item", { message: "Item not found." }),
+    s.precondition({
+      expr: expr(ref("item.status"), "!=", c.text("retired")),
+      error_type: "badrequest",
+      error: c.text("This item is retired."),
+    }),
+    s.db.query({
+      table: waitlistTable,
+      where: [expr(col("item_id"), "=", inp("item_id")), expr(col("user_id"), "=", inp("user_id"))],
+      returnType: "exists",
+      as: "already",
+    }),
+    s.precondition({
+      expr: expr(ref("already"), "=", c.bool(false)),
+      error_type: "badrequest",
+      error: c.text("You are already on the waitlist."),
+    }),
+    s.db.add({
+      table: waitlistTable,
+      row: { item_id: inp("item_id"), user_id: inp("user_id") },
+      as: "entry",
+    }),
+  ],
+  response: ref("entry"),
+});

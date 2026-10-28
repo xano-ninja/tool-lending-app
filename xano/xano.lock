@@ -50,6 +50,9 @@
     "function:item_waitlist": {
       "guid": "838b4e1961a65b997facf65d76f3635e"
     },
+    "function:join_waitlist": {
+      "guid": "48e1f2a9c87f6fe0e81eac6d15987688"
+    },
     "function:leave_waitlist": {
       "guid": "3d8fc7dc3b03f9e1f34fe8c7317aa11f"
     },
@@ -175,6 +178,15 @@
     },
     "workflow_test:item waitlist lists members in the order they joined": {
       "guid": "40b274a83db08eb64af634fec3fb0cfb"
+    },
+    "workflow_test:joining a waitlist twice is refused": {
+      "guid": "02f090f891a9287e1170e5580b5a70dc"
+    },
+    "workflow_test:joining puts the member at the back of the line": {
+      "guid": "7c4380806fc956974dc8f17e50ce58de"
+    },
+    "workflow_test:joining the waitlist of a retired item is refused": {
+      "guid": "bee63fcb5303e98d00428f963853a184"
     },
     "workflow_test:lapsed hold passes the item to the next in line": {
       "guid": "a900b4fa39fba97085dd0754d3e380f7"
