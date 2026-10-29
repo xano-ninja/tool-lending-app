@@ -38,6 +38,9 @@
     "function:Getting Started Template/create_event_log": {
       "guid": "19bb274c20b194d7fa03ca4bafb3ac4c"
     },
+    "function:add_note": {
+      "guid": "4078a74e869d1cd2d5cd55c10a1796a7"
+    },
     "function:checkout_loan": {
       "guid": "6813c81399b11d587da9ac162bf9f0fd"
     },
@@ -160,6 +163,12 @@
     },
     "workflow_test:a hold inside its window is kept": {
       "guid": "11d3a3a5a42a8e21c6fb80c8255e11c5"
+    },
+    "workflow_test:add note records the note against the item": {
+      "guid": "174699e4bab9b969950008b1a9a1bb65"
+    },
+    "workflow_test:add note refuses an unknown item": {
+      "guid": "15ab9a04005205ce56d55f98f1f59f30"
     },
     "workflow_test:approve moves a requested loan to approved": {
       "guid": "9aadfcb3aaa645f34a78b7991861bd06"

@@ -1,7 +1,6 @@
 import { query, input, inp, s, ref, auth, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { conditionNoteTable } from "../tables/condition_note.js";
-import { itemTable } from "../tables/item.js";
+import { addNoteFn } from "../functions/notes.js";
 import { api } from "./group.js";
 
 export const addNoteQuery = query({
@@ -15,11 +14,9 @@ export const addNoteQuery = query({
   },
   stack: [
     ...guard.role(userTable, "admin"),
-    s.db.get({ table: itemTable, fieldValue: inp("id"), as: "item" }),
-    guard.found("item", { message: "Item not found." }),
-    s.db.add({
-      table: conditionNoteTable,
-      row: { item_id: inp("id"), user_id: auth("id"), note: inp("note") },
+    s.function.run({
+      fn: addNoteFn,
+      input: { item_id: inp("id"), user_id: auth("id"), note: inp("note") },
       as: "note",
     }),
   ],

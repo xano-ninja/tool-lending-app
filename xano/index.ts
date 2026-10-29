@@ -17,6 +17,7 @@ import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { listLoansFn } from "./functions/list_loans.js";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
+import { addNoteFn } from "./functions/notes.js";
 import { requestLoanFn } from "./functions/request_loan.js";
 import { expireHoldsFn, joinWaitlistFn, leaveWaitlistFn, notifyWaitlistFn, removeWaitlistEntryFn } from "./functions/waitlist_notice.js";
 import { aheadInLineAddon, itemWaitlistFn, memberWaitlistFn } from "./functions/waitlist_queue.js";
@@ -46,6 +47,7 @@ import {
   loanWaitlistTest,
 } from "./tests/loans.js";
 import { memberEmptyHistoryTest, memberLoansTest, memberMissingTest, membersSortedTest, memberWaitlistTest } from "./tests/members.js";
+import { addNoteMissingItemTest, addNoteTest } from "./tests/notes.js";
 import { overdueTest } from "./tests/overdue.js";
 import {
   aheadInLineTest,
@@ -87,6 +89,7 @@ const app = workspace("tool-lending-app")
     memberLoansFn,
     memberHistoryFn,
     listLoansFn,
+    addNoteFn,
   ])
   .registerTasks([overdueTask, waitlistTask])
   .registerQueries([
@@ -144,6 +147,8 @@ const app = workspace("tool-lending-app")
     joinTwiceTest,
     joinRetiredTest,
     membersSortedTest,
+    addNoteTest,
+    addNoteMissingItemTest,
     memberLoansTest,
     memberWaitlistTest,
     memberMissingTest,
