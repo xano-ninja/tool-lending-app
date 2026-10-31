@@ -1,5 +1,6 @@
 import { query, input, inp, col, cmp, expr, and, s, ref, c, guard, withFilters, fl } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { listItemsFn } from "../functions/list_items.js";
 import { notifyWaitlistFn } from "../functions/waitlist_notice.js";
 import { conditionNoteTable } from "../tables/condition_note.js";
 import { ITEM_STATUSES, itemTable } from "../tables/item.js";
@@ -15,17 +16,7 @@ export const itemsQuery = query({
     category: input.text(),
     status: input.enum([...ITEM_STATUSES]),
   },
-  stack: [
-    s.db.query({
-      table: itemTable,
-      where: [
-        cmp(col("category"), "=", inp("category"), { ignoreEmpty: true }),
-        cmp(col("status"), "=", inp("status"), { ignoreEmpty: true }),
-      ],
-      sort: [{ sortBy: "name", dir: "asc" }],
-      as: "rows",
-    }),
-  ],
+  stack: [s.function.run({ fn: listItemsFn, input: { category: inp("category"), status: inp("status") }, as: "rows" })],
   response: ref("rows"),
 });
 
