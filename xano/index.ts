@@ -14,6 +14,7 @@ import { memberLoansQuery, membersQuery } from "./api/members.js";
 import { addNoteQuery } from "./api/notes.js";
 import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
 import { flagOverdueFn } from "./functions/flag_overdue.js";
+import { listItemsFn } from "./functions/list_items.js";
 import { listLoansFn } from "./functions/list_loans.js";
 import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
@@ -47,6 +48,7 @@ import {
   loanWaitlistTest,
 } from "./tests/loans.js";
 import { memberEmptyHistoryTest, memberLoansTest, memberMissingTest, membersSortedTest, memberWaitlistTest } from "./tests/members.js";
+import { listItemsFilterTest } from "./tests/items.js";
 import { addNoteMissingItemTest, addNoteTest } from "./tests/notes.js";
 import { overdueTest } from "./tests/overdue.js";
 import {
@@ -88,6 +90,7 @@ const app = workspace("tool-lending-app")
     listMembersFn,
     memberLoansFn,
     memberHistoryFn,
+    listItemsFn,
     listLoansFn,
     addNoteFn,
   ])
@@ -114,6 +117,7 @@ const app = workspace("tool-lending-app")
     membersQuery,
   ])
   .registerWorkflowTests([
+    listItemsFilterTest,
     loanRequestTest,
     loanDatesTest,
     loanPastStartTest,
