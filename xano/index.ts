@@ -69,6 +69,7 @@ import {
   joinTest,
   joinTwiceTest,
   joinRetiredTest,
+  joinMissingTest,
 } from "./tests/waitlist.js";
 
 const app = workspace("tool-lending-app")
@@ -155,6 +156,7 @@ const app = workspace("tool-lending-app")
     joinTest,
     joinTwiceTest,
     joinRetiredTest,
+    joinMissingTest,
     membersSortedTest,
     addNoteTest,
     addNoteMissingItemTest,

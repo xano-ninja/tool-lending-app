@@ -285,3 +285,16 @@ export const joinRetiredTest = workflowTest({
     }),
   ],
 });
+
+export const joinMissingTest = workflowTest({
+  name: "joining the waitlist of an unknown item is refused",
+  stack: [
+    s.expect.to_throw({
+      body: [
+        member("first"),
+        s.function.run({ fn: joinWaitlistFn, input: { item_id: c.int(999999), user_id: ref("first.id") } }),
+      ],
+      exception: c.text("Item not found"),
+    }),
+  ],
+});

@@ -215,6 +215,9 @@
     "workflow_test:joining the waitlist of a retired item is refused": {
       "guid": "bee63fcb5303e98d00428f963853a184"
     },
+    "workflow_test:joining the waitlist of an unknown item is refused": {
+      "guid": "3ce09251c5a5d336e62f4319890104ca"
+    },
     "workflow_test:lapsed hold passes the item to the next in line": {
       "guid": "a900b4fa39fba97085dd0754d3e380f7"
     },
