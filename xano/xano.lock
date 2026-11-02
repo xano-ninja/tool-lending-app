@@ -50,6 +50,9 @@
     "function:flag_overdue_loans": {
       "guid": "6cc57f41d2e0863b60c4b56973945c57"
     },
+    "function:item_detail": {
+      "guid": "36963b80d6c303e045f6edc6a42231f5"
+    },
     "function:item_waitlist": {
       "guid": "838b4e1961a65b997facf65d76f3635e"
     },
@@ -187,6 +190,15 @@
     },
     "workflow_test:every lapsed hold in a run is passed on": {
       "guid": "7a3bec0c52d72c1d2574ddb07ecc0030"
+    },
+    "workflow_test:item detail is empty for an item never lent": {
+      "guid": "aad3da7f4357bd6a15d9b95238eb40da"
+    },
+    "workflow_test:item detail refuses an unknown item": {
+      "guid": "7016c4c656db9781021fe222c43b9653"
+    },
+    "workflow_test:item detail shows current loan, waitlist, notes and history": {
+      "guid": "772e24093eb513b154018012acd7bbc9"
     },
     "workflow_test:item waitlist lists members in the order they joined": {
       "guid": "40b274a83db08eb64af634fec3fb0cfb"
