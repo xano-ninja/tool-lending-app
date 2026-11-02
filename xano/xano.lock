@@ -95,6 +95,9 @@
     "function:transition_loan": {
       "guid": "31a6af62a899fef5790c4e2eb5ba4383"
     },
+    "function:update_item": {
+      "guid": "6658dac1e93f39513d532e08abf390b7"
+    },
     "query:Authentication|GET|auth/me": {
       "guid": "8e64176a70b122ffed0ce68ceed6b9ce"
     },
@@ -191,6 +194,9 @@
     "workflow_test:every lapsed hold in a run is passed on": {
       "guid": "7a3bec0c52d72c1d2574ddb07ecc0030"
     },
+    "workflow_test:item back from repair notifies the waitlist": {
+      "guid": "38e71c4c4a70005dd0e13a5a07a3a958"
+    },
     "workflow_test:item detail is empty for an item never lent": {
       "guid": "aad3da7f4357bd6a15d9b95238eb40da"
     },
@@ -199,6 +205,15 @@
     },
     "workflow_test:item detail shows current loan, waitlist, notes and history": {
       "guid": "772e24093eb513b154018012acd7bbc9"
+    },
+    "workflow_test:item edit that stays available leaves the waitlist alone": {
+      "guid": "d71f4ec6449a6fe7798dba2ccdca75bf"
+    },
+    "workflow_test:item update keeps the fields it is not given": {
+      "guid": "b5cce87a186c1618afc8f27055d3451e"
+    },
+    "workflow_test:item update refuses an unknown item": {
+      "guid": "9b334f0e3ad4f939f117d4a9585591d3"
     },
     "workflow_test:item waitlist lists members in the order they joined": {
       "guid": "40b274a83db08eb64af634fec3fb0cfb"
