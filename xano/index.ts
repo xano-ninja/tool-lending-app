@@ -21,6 +21,7 @@ import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { addNoteFn } from "./functions/notes.js";
 import { requestLoanFn } from "./functions/request_loan.js";
+import { updateItemFn } from "./functions/update_item.js";
 import { expireHoldsFn, joinWaitlistFn, leaveWaitlistFn, notifyWaitlistFn, removeWaitlistEntryFn } from "./functions/waitlist_notice.js";
 import { aheadInLineAddon, itemWaitlistFn, memberWaitlistFn } from "./functions/waitlist_queue.js";
 import { conditionNoteTable } from "./tables/condition_note.js";
@@ -49,7 +50,16 @@ import {
   loanWaitlistTest,
 } from "./tests/loans.js";
 import { memberEmptyHistoryTest, memberLoansTest, memberMissingTest, membersSortedTest, memberWaitlistTest } from "./tests/members.js";
-import { itemDetailIdleTest, itemDetailMissingTest, itemDetailTest, listItemsFilterTest } from "./tests/items.js";
+import {
+  itemDetailIdleTest,
+  itemDetailMissingTest,
+  itemDetailTest,
+  listItemsFilterTest,
+  updateItemKeepsTest,
+  updateItemMissingTest,
+  updateItemRepairedTest,
+  updateItemStillAvailableTest,
+} from "./tests/items.js";
 import { addNoteMissingItemTest, addNoteTest } from "./tests/notes.js";
 import { overdueTest } from "./tests/overdue.js";
 import {
@@ -94,6 +104,7 @@ const app = workspace("tool-lending-app")
     memberHistoryFn,
     listItemsFn,
     itemDetailFn,
+    updateItemFn,
     listLoansFn,
     addNoteFn,
   ])
@@ -124,6 +135,10 @@ const app = workspace("tool-lending-app")
     itemDetailTest,
     itemDetailIdleTest,
     itemDetailMissingTest,
+    updateItemKeepsTest,
+    updateItemRepairedTest,
+    updateItemStillAvailableTest,
+    updateItemMissingTest,
     loanRequestTest,
     loanDatesTest,
     loanPastStartTest,
