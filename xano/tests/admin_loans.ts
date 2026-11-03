@@ -1,13 +1,13 @@
 import { workflowTest, s, ref, c } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { listLoansFn } from "../functions/list_loans.js";
-import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
+import { cancelLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
 import { itemTable } from "../tables/item.js";
-import { loanTable } from "../tables/loan.js";
+import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
 import { waitlistTable } from "../tables/waitlist.js";
 
 type ItemStatus = "available" | "on_loan" | "in_repair" | "retired";
-type LoanStatus = "requested" | "approved" | "out" | "returned" | "rejected";
+type LoanStatus = (typeof LOAN_STATUSES)[number];
 
 const member = (as: string, email: string) =>
   s.db.add({
@@ -178,5 +178,41 @@ export const listStatusTest = workflowTest({
     s.expect.to_not_be_defined({ expr: ref("out.2") }),
     s.function.run({ fn: listLoansFn, as: "all" }),
     s.expect.to_be_defined({ expr: ref("all.3") }),
+  ],
+});
+
+const cancel = (who = "member") =>
+  s.function.run({
+    fn: cancelLoanFn,
+    input: { loan_id: ref("loan.id"), user_id: ref(`${who}.id`) },
+    as: "updated",
+  });
+
+export const cancelTest = workflowTest({
+  name: "member cancels a pending request",
+  stack: [
+    ...fixtures("requested"),
+    cancel(),
+    s.expect.to_equal({ expr: ref("updated.status"), value: c.text("cancelled") }),
+  ],
+});
+
+export const cancelApprovedTest = workflowTest({
+  name: "cancel refuses a loan that is not requested",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures("approved"), cancel()],
+      exception: c.text("Only a pending request"),
+    }),
+  ],
+});
+
+export const cancelOtherMemberTest = workflowTest({
+  name: "cancel refuses another member's request",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures("requested"), member("other", "other@example.com"), cancel("other")],
+      exception: c.text("Loan not found"),
+    }),
   ],
 });

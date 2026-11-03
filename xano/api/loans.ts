@@ -1,5 +1,6 @@
 import { query, input, inp, s, ref, auth } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { cancelLoanFn } from "../functions/loan_transitions.js";
 import { memberLoansFn } from "../functions/members.js";
 import { requestLoanFn } from "../functions/request_loan.js";
 import { api } from "./group.js";
@@ -36,4 +37,16 @@ export const myLoansQuery = query({
   auth: userTable,
   stack: [s.function.run({ fn: memberLoansFn, input: { user_id: auth("id") }, as: "loans" })],
   response: ref("loans"),
+});
+
+export const cancelLoanQuery = query({
+  name: "loans/{id}/cancel",
+  verb: "PATCH",
+  apiGroup: api,
+  auth: userTable,
+  input: { id: input.int({ required: true }) },
+  stack: [
+    s.function.run({ fn: cancelLoanFn, input: { loan_id: inp("id"), user_id: auth("id") }, as: "updated" }),
+  ],
+  response: ref("updated"),
 });

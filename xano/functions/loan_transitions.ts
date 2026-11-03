@@ -90,3 +90,30 @@ export const returnLoanFn = defineFunction({
     notified_user_id: ref("notice.notified_user_id"),
   },
 });
+
+export const cancelLoanFn = defineFunction({
+  name: "cancel_loan",
+  description: "Let a member withdraw a loan request before it is approved.",
+  input: { loan_id: input.int({ required: true }), user_id: input.int({ required: true }) },
+  stack: [
+    s.db.get({ table: loanTable, fieldValue: inp("loan_id"), as: "loan" }),
+    guard.found("loan", { message: "Loan not found." }),
+    s.precondition({
+      expr: expr(ref("loan.user_id"), "=", inp("user_id")),
+      error_type: "notfound",
+      error: c.text("Loan not found."),
+    }),
+    s.precondition({
+      expr: expr(ref("loan.status"), "=", c.text("requested")),
+      error_type: "badrequest",
+      error: c.text("Only a pending request can be cancelled."),
+    }),
+    s.db.patch({
+      table: loanTable,
+      fieldValue: inp("loan_id"),
+      data: obj({ status: c.text("cancelled") }),
+      as: "updated",
+    }),
+  ],
+  response: ref("updated"),
+});
