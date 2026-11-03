@@ -30,7 +30,7 @@
       .filter((l) => l.status === "requested" || l.status === "approved" || l.status === "out")
       .sort((a, b) => Number(isOverdue(b)) - Number(isOverdue(a))),
   );
-  const past = $derived(loans.filter((l) => l.status === "returned" || l.status === "rejected"));
+  const past = $derived(loans.filter((l) => ["returned", "rejected", "cancelled"].includes(l.status)));
   const late = $derived(loans.filter((l) => l.overdue).length);
   const waitlist = $derived(data?.waitlist ?? []);
 

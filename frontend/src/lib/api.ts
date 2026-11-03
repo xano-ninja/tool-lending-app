@@ -165,6 +165,10 @@ export function myLoans() {
   return request<MyLoan[]>("GET me/loans", routePath("GET me/loans"));
 }
 
+export function cancelLoan(id: number) {
+  return request<Loan>("PATCH loans/{id}/cancel", routePath("PATCH loans/{id}/cancel", { id }));
+}
+
 export function joinWaitlist(id: number) {
   return request<WaitlistEntry>(
     "POST items/{id}/waitlist",

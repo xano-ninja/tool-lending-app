@@ -9,7 +9,7 @@ import {
   returnLoanQuery,
 } from "./api/admin_loans.js";
 import { createItemQuery, itemQuery, itemsQuery, updateItemQuery } from "./api/items.js";
-import { myLoansQuery, requestLoanQuery } from "./api/loans.js";
+import { cancelLoanQuery, myLoansQuery, requestLoanQuery } from "./api/loans.js";
 import { memberLoansQuery, membersQuery } from "./api/members.js";
 import { addNoteQuery } from "./api/notes.js";
 import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
@@ -17,7 +17,7 @@ import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { itemDetailFn } from "./functions/item_detail.js";
 import { listItemsFn } from "./functions/list_items.js";
 import { listLoansFn } from "./functions/list_loans.js";
-import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
+import { cancelLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { addNoteFn } from "./functions/notes.js";
 import { requestLoanFn } from "./functions/request_loan.js";
@@ -33,6 +33,9 @@ import { waitlistTask } from "./tasks/waitlist.js";
 import {
   approveTest,
   approveTwiceTest,
+  cancelApprovedTest,
+  cancelOtherMemberTest,
+  cancelTest,
   checkoutRepairTest,
   checkoutTest,
   listOverdueTest,
@@ -91,6 +94,7 @@ const app = workspace("tool-lending-app")
     transitionLoanFn,
     checkoutLoanFn,
     returnLoanFn,
+    cancelLoanFn,
     flagOverdueFn,
     notifyWaitlistFn,
     expireHoldsFn,
@@ -116,6 +120,7 @@ const app = workspace("tool-lending-app")
     updateItemQuery,
     requestLoanQuery,
     myLoansQuery,
+    cancelLoanQuery,
     joinWaitlistQuery,
     leaveWaitlistQuery,
     myWaitlistQuery,
@@ -152,6 +157,9 @@ const app = workspace("tool-lending-app")
     returnTest,
     returnNoWaitlistTest,
     returnTwiceTest,
+    cancelTest,
+    cancelApprovedTest,
+    cancelOtherMemberTest,
     listOverdueTest,
     listStatusTest,
     overdueTest,

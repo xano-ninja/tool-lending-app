@@ -41,6 +41,9 @@
     "function:add_note": {
       "guid": "4078a74e869d1cd2d5cd55c10a1796a7"
     },
+    "function:cancel_loan": {
+      "guid": "f12bf2068ba6f9cfb3eda2462eaf4439"
+    },
     "function:checkout_loan": {
       "guid": "6813c81399b11d587da9ac162bf9f0fd"
     },
@@ -143,6 +146,9 @@
     "query:tool_library|PATCH|loans/{id}/approve": {
       "guid": "dd32957f710a18cef0aff1c3855b898a"
     },
+    "query:tool_library|PATCH|loans/{id}/cancel": {
+      "guid": "2294162037d7726c9987fa839336cb74"
+    },
     "query:tool_library|PATCH|loans/{id}/checkout": {
       "guid": "c50591de4baeb73f6cecf3b2cb4cd2a8"
     },
@@ -184,6 +190,12 @@
     },
     "workflow_test:approve refuses a loan that is not requested": {
       "guid": "037eb372c8fe64b1b58f771cc327ea8f"
+    },
+    "workflow_test:cancel refuses a loan that is not requested": {
+      "guid": "0f18a5595e6e94505475a6fe15195a0b"
+    },
+    "workflow_test:cancel refuses another member's request": {
+      "guid": "466ba1fe6bf3b5a1783414c904d80385"
     },
     "workflow_test:checkout puts the item on loan": {
       "guid": "fd3024cd964e9ca08f7440588b33707b"
@@ -262,6 +274,9 @@
     },
     "workflow_test:loan request takes the member off the waitlist": {
       "guid": "99522ed5260bb552749b9d7b86ef1d27"
+    },
+    "workflow_test:member cancels a pending request": {
+      "guid": "d1017c8860b191be6bf3b9af1214e1bb"
     },
     "workflow_test:member history includes the member's waitlist": {
       "guid": "eb3b27b134803175b0a0b76a3b67479d"

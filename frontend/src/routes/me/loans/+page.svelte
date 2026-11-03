@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { leaveWaitlist, myLoans, myWaitlist, type MyLoan, type MyWaitlistEntry } from "$lib/api";
+  import { cancelLoan, leaveWaitlist, myLoans, myWaitlist, type MyLoan, type MyWaitlistEntry } from "$lib/api";
   import {
     errorMessage,
     formatDate,
@@ -24,7 +24,7 @@
       .filter((l) => l.status === "requested" || l.status === "approved" || l.status === "out")
       .sort((a, b) => Number(isOverdue(b)) - Number(isOverdue(a))),
   );
-  const past = $derived(loans.filter((l) => l.status === "returned" || l.status === "rejected"));
+  const past = $derived(loans.filter((l) => ["returned", "rejected", "cancelled"].includes(l.status)));
 
   async function load() {
     loading = true;
@@ -44,6 +44,15 @@
       waitlist = waitlist.filter((w) => w.id !== entry.id);
     } catch (e) {
       error = errorMessage(e, "Could not leave the waitlist.");
+    }
+  }
+
+  async function cancel(loan: MyLoan) {
+    try {
+      const updated = await cancelLoan(loan.id);
+      loans = loans.map((l) => (l.id === loan.id ? { ...l, status: updated.status } : l));
+    } catch (e) {
+      error = errorMessage(e, "Could not cancel the request.");
     }
   }
 
@@ -67,7 +76,12 @@
         {#if loan.returned_at}· returned {formatTimestamp(loan.returned_at)}{/if}
       </p>
     </div>
-    <Badge variant={loanVariant(loan)}>{loanLabel(loan)}</Badge>
+    <div class="flex items-center gap-2">
+      <Badge variant={loanVariant(loan)}>{loanLabel(loan)}</Badge>
+      {#if loan.status === "requested"}
+        <Button variant="ghost" size="sm" onclick={() => cancel(loan)}>Cancel</Button>
+      {/if}
+    </div>
   </li>
 {/snippet}
 

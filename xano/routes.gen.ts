@@ -96,6 +96,7 @@ export const ROUTES = {
   "GET loans": { verb: "GET", path: "/api:tools/loans" },
   "POST loans": { verb: "POST", path: "/api:tools/loans" },
   "PATCH loans/{id}/approve": { verb: "PATCH", path: "/api:tools/loans/{id}/approve" },
+  "PATCH loans/{id}/cancel": { verb: "PATCH", path: "/api:tools/loans/{id}/cancel" },
   "PATCH loans/{id}/checkout": { verb: "PATCH", path: "/api:tools/loans/{id}/checkout" },
   "PATCH loans/{id}/reject": { verb: "PATCH", path: "/api:tools/loans/{id}/reject" },
   "PATCH loans/{id}/return": { verb: "PATCH", path: "/api:tools/loans/{id}/return" },
@@ -131,6 +132,7 @@ export function routePath(name: "POST items/{id}/waitlist", params: { "id": stri
 export function routePath(name: "GET loans"): string;
 export function routePath(name: "POST loans"): string;
 export function routePath(name: "PATCH loans/{id}/approve", params: { "id": string | number }): string;
+export function routePath(name: "PATCH loans/{id}/cancel", params: { "id": string | number }): string;
 export function routePath(name: "PATCH loans/{id}/checkout", params: { "id": string | number }): string;
 export function routePath(name: "PATCH loans/{id}/reject", params: { "id": string | number }): string;
 export function routePath(name: "PATCH loans/{id}/return", params: { "id": string | number }): string;
@@ -206,7 +208,7 @@ export type RouteInputs = {
     id: number;
   };
   "GET loans": {
-    status?: "requested" | "approved" | "out" | "returned" | "rejected" | "overdue";
+    status?: "requested" | "approved" | "out" | "returned" | "rejected" | "cancelled" | "overdue";
   };
   "POST loans": {
     item_id: number;
@@ -214,6 +216,9 @@ export type RouteInputs = {
     due_date: string | null;
   };
   "PATCH loans/{id}/approve": {
+    id: number;
+  };
+  "PATCH loans/{id}/cancel": {
     id: number;
   };
   "PATCH loans/{id}/checkout": {
