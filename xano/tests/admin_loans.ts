@@ -216,3 +216,30 @@ export const cancelOtherMemberTest = workflowTest({
     }),
   ],
 });
+
+export const cancelTwiceTest = workflowTest({
+  name: "cancel refuses a request already cancelled",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures("cancelled"), cancel()],
+      exception: c.text("Only a pending request"),
+    }),
+  ],
+});
+
+export const cancelMissingTest = workflowTest({
+  name: "cancel refuses an unknown loan",
+  stack: [
+    s.expect.to_throw({
+      body: [
+        member("member", "member@example.com"),
+        s.function.run({
+          fn: cancelLoanFn,
+          input: { loan_id: c.int(999999), user_id: ref("member.id") },
+          as: "updated",
+        }),
+      ],
+      exception: c.text("Loan not found"),
+    }),
+  ],
+});
