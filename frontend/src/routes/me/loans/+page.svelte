@@ -17,6 +17,8 @@
   let loans = $state<MyLoan[]>([]);
   let waitlist = $state<MyWaitlistEntry[]>([]);
   let error = $state("");
+  let actionError = $state("");
+  let cancelling = $state<number | null>(null);
   let loading = $state(true);
 
   const current = $derived(
@@ -43,16 +45,21 @@
       await leaveWaitlist(entry.item_id);
       waitlist = waitlist.filter((w) => w.id !== entry.id);
     } catch (e) {
-      error = errorMessage(e, "Could not leave the waitlist.");
+      actionError = errorMessage(e, "Could not leave the waitlist.");
     }
   }
 
   async function cancel(loan: MyLoan) {
+    if (!confirm(`Cancel your request for ${loan.item_name ?? "this item"}?`)) return;
+    cancelling = loan.id;
+    actionError = "";
     try {
       const updated = await cancelLoan(loan.id);
       loans = loans.map((l) => (l.id === loan.id ? { ...l, status: updated.status } : l));
     } catch (e) {
-      error = errorMessage(e, "Could not cancel the request.");
+      actionError = errorMessage(e, "Could not cancel the request.");
+    } finally {
+      cancelling = null;
     }
   }
 
@@ -79,7 +86,9 @@
     <div class="flex items-center gap-2">
       <Badge variant={loanVariant(loan)}>{loanLabel(loan)}</Badge>
       {#if loan.status === "requested"}
-        <Button variant="ghost" size="sm" onclick={() => cancel(loan)}>Cancel</Button>
+        <Button variant="ghost" size="sm" disabled={cancelling === loan.id} onclick={() => cancel(loan)}>
+          {cancelling === loan.id ? "Cancelling..." : "Cancel"}
+        </Button>
       {/if}
     </div>
   </li>
@@ -100,6 +109,7 @@
   {:else if loading}
     <p class="text-muted-foreground text-sm">Loading...</p>
   {:else}
+    {#if actionError}<p class="text-destructive text-sm">{actionError}</p>{/if}
     <section class="space-y-2">
       <h2 class="text-lg font-medium">Current</h2>
       {#if current.length === 0}
