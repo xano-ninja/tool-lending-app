@@ -191,6 +191,12 @@
     "workflow_test:approve refuses a loan that is not requested": {
       "guid": "037eb372c8fe64b1b58f771cc327ea8f"
     },
+    "workflow_test:cancel leaves the waitlist alone while the item is out": {
+      "guid": "b6ef9b6a9679d7ef262494a96cfcde44"
+    },
+    "workflow_test:cancel passes an available item to the waitlist": {
+      "guid": "8bc44faaa87628194e3d396006255b5c"
+    },
     "workflow_test:cancel refuses a loan that is not requested": {
       "guid": "0f18a5595e6e94505475a6fe15195a0b"
     },
