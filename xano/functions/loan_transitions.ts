@@ -114,6 +114,7 @@ export const cancelLoanFn = defineFunction({
       data: obj({ status: c.text("cancelled") }),
       as: "updated",
     }),
+    s.function.run({ fn: notifyWaitlistFn, input: { item_id: ref("loan.item_id") } }),
   ],
   response: ref("updated"),
 });

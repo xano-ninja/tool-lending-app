@@ -243,3 +243,35 @@ export const cancelMissingTest = workflowTest({
     }),
   ],
 });
+
+export const cancelNotifiesTest = workflowTest({
+  name: "cancel passes an available item to the waitlist",
+  stack: [
+    ...fixtures("requested"),
+    member("waiter", "waiter@example.com"),
+    s.db.add({
+      table: waitlistTable,
+      row: { item_id: ref("item.id"), user_id: ref("waiter.id") },
+      as: "waiting",
+    }),
+    cancel(),
+    s.db.get({ table: waitlistTable, fieldValue: ref("waiting.id"), as: "after" }),
+    s.expect.to_not_be_null({ expr: ref("after.notified_at") }),
+  ],
+});
+
+export const cancelOnLoanTest = workflowTest({
+  name: "cancel leaves the waitlist alone while the item is out",
+  stack: [
+    ...fixtures("requested", "on_loan"),
+    member("waiter", "waiter@example.com"),
+    s.db.add({
+      table: waitlistTable,
+      row: { item_id: ref("item.id"), user_id: ref("waiter.id") },
+      as: "waiting",
+    }),
+    cancel(),
+    s.db.get({ table: waitlistTable, fieldValue: ref("waiting.id"), as: "after" }),
+    s.expect.to_be_null({ expr: ref("after.notified_at") }),
+  ],
+});
