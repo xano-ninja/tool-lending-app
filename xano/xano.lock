@@ -47,6 +47,9 @@
     "function:checkout_loan": {
       "guid": "6813c81399b11d587da9ac162bf9f0fd"
     },
+    "function:create_item": {
+      "guid": "daa5aa96d22bbe820686bd587810946c"
+    },
     "function:expire_waitlist_holds": {
       "guid": "63b74b26b3045d1e00aebffb77348fc0"
     },

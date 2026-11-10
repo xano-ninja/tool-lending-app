@@ -1,9 +1,10 @@
-import { query, input, inp, s, ref, guard, withFilters, fl } from "@xano/sdk";
+import { query, input, inp, s, ref, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { createItemFn } from "../functions/create_item.js";
 import { itemDetailFn } from "../functions/item_detail.js";
 import { listItemsFn } from "../functions/list_items.js";
 import { updateItemFn } from "../functions/update_item.js";
-import { ITEM_STATUSES, itemTable } from "../tables/item.js";
+import { ITEM_STATUSES } from "../tables/item.js";
 import { api } from "./group.js";
 
 export const itemsQuery = query({
@@ -41,14 +42,14 @@ export const createItemQuery = query({
   },
   stack: [
     ...guard.role(userTable, "admin"),
-    s.db.add({
-      table: itemTable,
-      row: {
+    s.function.run({
+      fn: createItemFn,
+      input: {
         name: inp("name"),
         category: inp("category"),
         description: inp("description"),
         photo: inp("photo"),
-        status: withFilters(inp("status"), fl.first_notnull("available")),
+        status: inp("status"),
       },
       as: "item",
     }),

@@ -21,6 +21,7 @@ import { cancelLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { addNoteFn } from "./functions/notes.js";
 import { requestLoanFn } from "./functions/request_loan.js";
+import { createItemFn } from "./functions/create_item.js";
 import { updateItemFn } from "./functions/update_item.js";
 import { expireHoldsFn, joinWaitlistFn, leaveWaitlistFn, notifyWaitlistFn, removeWaitlistEntryFn } from "./functions/waitlist_notice.js";
 import { aheadInLineAddon, itemWaitlistFn, memberWaitlistFn } from "./functions/waitlist_queue.js";
@@ -112,6 +113,7 @@ const app = workspace("tool-lending-app")
     memberHistoryFn,
     listItemsFn,
     itemDetailFn,
+    createItemFn,
     updateItemFn,
     listLoansFn,
     addNoteFn,
