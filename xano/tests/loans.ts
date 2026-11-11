@@ -141,6 +141,36 @@ export const loanClashEdgeTest = workflowTest({
   ],
 });
 
+export const loanClashWrapTest = workflowTest({
+  name: "loan request refuses dates that wrap a booking",
+  stack: [
+    s.expect.to_throw({
+      body: [
+        ...fixtures(),
+        other,
+        booking("2099-11-05", "2099-11-06", "approved"),
+        request("2099-11-01", "2099-11-10"),
+      ],
+      exception: c.text("booked from 2099-11-05 to 2099-11-06"),
+    }),
+  ],
+});
+
+export const loanClashEndEdgeTest = workflowTest({
+  name: "loan request refuses a due date on a booking's first day",
+  stack: [
+    s.expect.to_throw({
+      body: [
+        ...fixtures(),
+        other,
+        booking("2099-11-08", "2099-11-12", "approved"),
+        request("2099-11-01", "2099-11-08"),
+      ],
+      exception: c.text("booked from 2099-11-08"),
+    }),
+  ],
+});
+
 export const loanClashOverdueTest = workflowTest({
   name: "loan request refuses any dates while the item is overdue",
   stack: [

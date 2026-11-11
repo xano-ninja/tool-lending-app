@@ -296,6 +296,9 @@
     "workflow_test:loan request refuses a due date before the start": {
       "guid": "a88e0b0a5efa81822c7db96b08c32600"
     },
+    "workflow_test:loan request refuses a due date on a booking's first day": {
+      "guid": "4ac621e666ac195463789bd6c4637e5e"
+    },
     "workflow_test:loan request refuses a retired item": {
       "guid": "0547a658ee32cc9036c78c52aa0a2d85"
     },
@@ -313,6 +316,9 @@
     },
     "workflow_test:loan request refuses dates inside an approved loan": {
       "guid": "36de6158d7e63837a6807a2fe9797aa0"
+    },
+    "workflow_test:loan request refuses dates that wrap a booking": {
+      "guid": "f0885e7ee052b597dbfb85d04a44355f"
     },
     "workflow_test:loan request starts as requested": {
       "guid": "b6b3a214e26bf1be98983aecf77d0863"
