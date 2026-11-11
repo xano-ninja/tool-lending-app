@@ -22,6 +22,13 @@ holder leaves the waitlist or an admin removes them, the next member is
 notified at once; if they do nothing, `nightly_waitlist` (03:15 UTC) drops
 the lapsed hold, emails them that it expired, and moves on.
 
+An item cannot be booked twice for the same day. A request, and its approval,
+is refused when its dates overlap an approved or checked-out loan of the item
+(both ends inclusive); an overdue loan blocks every date until it is returned.
+Pending requests do not block each other, so an admin can approve one of two
+overlapping requests and the other is refused at approval. The item page shows
+the booked dates on a calendar and picks the first free week by default.
+
 Emails go through Xano's built-in mailer, and a failed send does not fail the
 request that triggered it or the nightly run.
 
