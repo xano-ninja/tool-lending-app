@@ -43,6 +43,12 @@ export function isOverdue(loan: LoanLike): boolean {
   return loan.status === "out" && (loan.overdue === true || loan.due_date < today());
 }
 
+export function daysLate(loan: LoanLike): number {
+  if (!isOverdue(loan)) return 0;
+  const ms = new Date(`${today()}T00:00:00`).getTime() - new Date(`${loan.due_date}T00:00:00`).getTime();
+  return Math.max(0, Math.round(ms / 86_400_000));
+}
+
 export function loanLabel(loan: LoanLike): string {
   if (isOverdue(loan)) return "overdue";
   if (loan.status === "returned" && loan.overdue) return "returned late";

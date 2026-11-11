@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import { cancelLoan, leaveWaitlist, myLoans, myWaitlist, type MyLoan, type MyWaitlistEntry } from "$lib/api";
   import {
+    daysLate,
     errorMessage,
     formatDate,
     formatTimestamp,
@@ -80,6 +81,9 @@
       </a>
       <p class="text-muted-foreground text-sm">
         {formatDate(loan.start_date)} to {formatDate(loan.due_date)}
+        {#if daysLate(loan) > 0}
+          · <span class="text-destructive">{daysLate(loan)} {daysLate(loan) === 1 ? "day" : "days"} late</span>
+        {/if}
         {#if loan.returned_at}· returned {formatTimestamp(loan.returned_at)}{/if}
       </p>
     </div>
