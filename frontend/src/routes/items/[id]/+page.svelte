@@ -8,6 +8,7 @@
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import { Textarea } from "$lib/components/ui/textarea/index.js";
+  import AvailabilityCalendar from "$lib/components/availability-calendar.svelte";
   import {
     addNote,
     getItem,
@@ -18,6 +19,7 @@
     type ItemDetail,
     type MyWaitlistEntry,
   } from "$lib/api";
+  import { clash, firstFree } from "$lib/booking";
   import {
     addDays,
     errorMessage,
@@ -25,6 +27,7 @@
     formatTimestamp,
     holdUntil,
     inLine,
+    isOverdue,
     loanLabel,
     loanVariant,
     today,
@@ -44,6 +47,8 @@
 
   let startDate = $state(today());
   let dueDate = $state(addDays(today(), 7));
+  let datesFor = 0;
+  const clashing = $derived(detail ? clash(detail.booked, startDate, dueDate) : undefined);
   let requestError = $state("");
   let requested = $state(false);
 
@@ -57,6 +62,14 @@
     error = "";
     try {
       detail = await getItem(id);
+      if (datesFor !== id) {
+        datesFor = id;
+        const free = firstFree(detail.booked, today(), 8);
+        if (free) {
+          startDate = free;
+          dueDate = addDays(free, 7);
+        }
+      }
     } catch (e) {
       detail = null;
       error = errorMessage(e, "Could not load this item.");
@@ -140,7 +153,7 @@
   {:else if loading && !detail}
     <p class="text-muted-foreground text-sm">Loading...</p>
   {:else if detail}
-    {@const { item, current_loan, waitlist_count, notes, history } = detail}
+    {@const { item, current_loan, booked, waitlist_count, notes, history } = detail}
     <header class="space-y-2">
       <div class="flex flex-wrap items-center gap-3">
         <h1 class="text-3xl font-semibold tracking-tight">{item.name}</h1>
@@ -221,6 +234,27 @@
             </Card.Description>
           </Card.Header>
           <Card.Content class="space-y-4">
+            {#if item.status !== "retired"}
+              <AvailabilityCalendar
+                {booked}
+                bind:start={startDate}
+                bind:due={dueDate}
+                selectable={!!session.user && !requested}
+              />
+              {#if booked.length > 0}
+                <ul class="space-y-1 text-sm">
+                  {#each booked as b (b.id)}
+                    <li class="flex items-center justify-between gap-2">
+                      <span>
+                        {formatDate(b.start_date)} to {isOverdue(b) ? "when returned" : formatDate(b.due_date)}
+                      </span>
+                      <Badge variant={loanVariant(b)}>{loanLabel(b)}</Badge>
+                    </li>
+                  {/each}
+                </ul>
+              {/if}
+            {/if}
+
             {#if item.status === "retired"}
               <p class="text-muted-foreground text-sm">This item is retired and cannot be borrowed.</p>
             {:else if !session.user}
@@ -244,8 +278,14 @@
                   <Label for="due">Until</Label>
                   <Input id="due" type="date" bind:value={dueDate} min={startDate} required />
                 </div>
+                {#if clashing}
+                  <p class="text-destructive text-sm">
+                    Booked from {formatDate(clashing.start_date)} to
+                    {isOverdue(clashing) ? "when it is returned" : formatDate(clashing.due_date)}. Pick other dates.
+                  </p>
+                {/if}
                 {#if requestError}<p class="text-destructive text-sm">{requestError}</p>{/if}
-                <Button type="submit" class="w-full" disabled={busy}>Request to borrow</Button>
+                <Button type="submit" class="w-full" disabled={busy || !!clashing}>Request to borrow</Button>
               </form>
             {/if}
 
