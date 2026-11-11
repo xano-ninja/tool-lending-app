@@ -1,7 +1,7 @@
 import { workflowTest, s, ref, c } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { listLoansFn } from "../functions/list_loans.js";
-import { cancelLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
+import { approveLoanFn, cancelLoanFn, checkoutLoanFn, returnLoanFn } from "../functions/loan_transitions.js";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
 import { waitlistTable } from "../tables/waitlist.js";
@@ -36,15 +36,27 @@ const fixtures = (loanStatus: LoanStatus, itemStatus: ItemStatus = "available") 
   }),
 ];
 
+const approve = s.function.run({ fn: approveLoanFn, input: { loan_id: ref("loan.id") }, as: "updated" });
+
+const rival = (status: LoanStatus) => [
+  member("rival", "rival@example.com"),
+  s.db.add({
+    table: loanTable,
+    row: {
+      item_id: ref("item.id"),
+      user_id: ref("rival.id"),
+      start_date: "2026-11-06",
+      due_date: "2026-11-12",
+      status,
+    },
+  }),
+];
+
 export const approveTest = workflowTest({
   name: "approve moves a requested loan to approved",
   stack: [
     ...fixtures("requested"),
-    s.function.run({
-      fn: transitionLoanFn,
-      input: { loan_id: ref("loan.id"), from: c.text("requested"), to: c.text("approved") },
-      as: "updated",
-    }),
+    approve,
     s.expect.to_equal({ expr: ref("updated.status"), value: c.text("approved") }),
   ],
 });
@@ -53,15 +65,38 @@ export const approveTwiceTest = workflowTest({
   name: "approve refuses a loan that is not requested",
   stack: [
     s.expect.to_throw({
-      body: [
-        ...fixtures("approved"),
-        s.function.run({
-          fn: transitionLoanFn,
-          input: { loan_id: ref("loan.id"), from: c.text("requested"), to: c.text("approved") },
-          as: "updated",
-        }),
-      ],
+      body: [...fixtures("approved"), approve],
       exception: c.text("Loan is not requested"),
+    }),
+  ],
+});
+
+export const approveClashTest = workflowTest({
+  name: "approve refuses dates another approved loan holds",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures("requested"), ...rival("approved"), approve],
+      exception: c.text("booked from 2026-11-06 to 2026-11-12"),
+    }),
+  ],
+});
+
+export const approveBesideRequestTest = workflowTest({
+  name: "approve is not blocked by an overlapping request",
+  stack: [
+    ...fixtures("requested"),
+    ...rival("requested"),
+    approve,
+    s.expect.to_equal({ expr: ref("updated.status"), value: c.text("approved") }),
+  ],
+});
+
+export const approveMissingTest = workflowTest({
+  name: "approve refuses an unknown loan",
+  stack: [
+    s.expect.to_throw({
+      body: [s.function.run({ fn: approveLoanFn, input: { loan_id: c.int(999999) } })],
+      exception: c.text("Loan not found"),
     }),
   ],
 });

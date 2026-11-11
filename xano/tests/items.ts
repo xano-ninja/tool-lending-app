@@ -71,12 +71,33 @@ export const itemDetailTest = workflowTest({
   ],
 });
 
+export const itemDetailBookedTest = workflowTest({
+  name: "item detail lists bookings still to come, soonest first",
+  stack: [
+    borrower,
+    item("drill", "power tools", "on_loan"),
+    loan("late", "2026-01-01", "2026-01-08", "out"),
+    loan("later", "2099-03-01", "2099-03-08", "approved"),
+    loan("sooner", "2099-02-01", "2099-02-08", "approved"),
+    loan("asked", "2099-04-01", "2099-04-08", "requested"),
+    loan("lapsed", "2026-02-01", "2026-02-08", "approved"),
+    loan("back", "2026-03-01", "2026-03-08", "returned"),
+    s.function.run({ fn: itemDetailFn, input: { item_id: ref("drill.id") }, as: "detail" }),
+    s.expect.to_equal({ expr: ref("detail.booked.0.start_date"), value: c.text("2026-01-01") }),
+    s.expect.to_equal({ expr: ref("detail.booked.0.status"), value: c.text("out") }),
+    s.expect.to_equal({ expr: ref("detail.booked.1.start_date"), value: c.text("2099-02-01") }),
+    s.expect.to_equal({ expr: ref("detail.booked.2.start_date"), value: c.text("2099-03-01") }),
+    s.expect.to_not_be_defined({ expr: ref("detail.booked.3") }),
+  ],
+});
+
 export const itemDetailIdleTest = workflowTest({
   name: "item detail is empty for an item never lent",
   stack: [
     item("ladder", "access", "available"),
     s.function.run({ fn: itemDetailFn, input: { item_id: ref("ladder.id") }, as: "detail" }),
     s.expect.to_be_null({ expr: ref("detail.current_loan") }),
+    s.expect.to_be_empty({ expr: ref("detail.booked") }),
     s.expect.to_equal({ expr: ref("detail.waitlist_count"), value: c.int(0) }),
     s.expect.to_be_empty({ expr: ref("detail.notes") }),
     s.expect.to_be_empty({ expr: ref("detail.history") }),

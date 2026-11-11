@@ -1,7 +1,7 @@
 import { query, input, inp, s, ref, c, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { listLoansFn } from "../functions/list_loans.js";
-import { checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
+import { approveLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
 import { notifyWaitlistFn } from "../functions/waitlist_notice.js";
 import { LOAN_STATUSES } from "../tables/loan.js";
 import { api } from "./group.js";
@@ -19,30 +19,18 @@ export const loansQuery = query({
   response: ref("loans"),
 });
 
-function transition(
-  action: string,
-  from: (typeof LOAN_STATUSES)[number],
-  to: (typeof LOAN_STATUSES)[number],
-) {
-  return query({
-    name: `loans/{id}/${action}`,
-    verb: "PATCH",
-    apiGroup: api,
-    auth: userTable,
-    input: { id: input.int({ required: true }) },
-    stack: [
-      ...guard.role(userTable, "admin"),
-      s.function.run({
-        fn: transitionLoanFn,
-        input: { loan_id: inp("id"), from: c.text(from), to: c.text(to) },
-        as: "updated",
-      }),
-    ],
-    response: ref("updated"),
-  });
-}
-
-export const approveLoanQuery = transition("approve", "requested", "approved");
+export const approveLoanQuery = query({
+  name: "loans/{id}/approve",
+  verb: "PATCH",
+  apiGroup: api,
+  auth: userTable,
+  input: { id: input.int({ required: true }) },
+  stack: [
+    ...guard.role(userTable, "admin"),
+    s.function.run({ fn: approveLoanFn, input: { loan_id: inp("id") }, as: "updated" }),
+  ],
+  response: ref("updated"),
+});
 
 export const rejectLoanQuery = query({
   name: "loans/{id}/reject",

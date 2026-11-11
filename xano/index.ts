@@ -13,11 +13,12 @@ import { cancelLoanQuery, myLoansQuery, requestLoanQuery } from "./api/loans.js"
 import { memberLoansQuery, membersQuery } from "./api/members.js";
 import { addNoteQuery } from "./api/notes.js";
 import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
+import { findClashFn } from "./functions/booking.js";
 import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { itemDetailFn } from "./functions/item_detail.js";
 import { listItemsFn } from "./functions/list_items.js";
 import { listLoansFn } from "./functions/list_loans.js";
-import { cancelLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
+import { approveLoanFn, cancelLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { addNoteFn } from "./functions/notes.js";
 import { requestLoanFn } from "./functions/request_loan.js";
@@ -32,6 +33,9 @@ import { waitlistTable } from "./tables/waitlist.js";
 import { overdueTask } from "./tasks/overdue.js";
 import { waitlistTask } from "./tasks/waitlist.js";
 import {
+  approveBesideRequestTest,
+  approveClashTest,
+  approveMissingTest,
   approveTest,
   approveTwiceTest,
   cancelApprovedTest,
@@ -50,6 +54,11 @@ import {
   returnTwiceTest,
 } from "./tests/admin_loans.js";
 import {
+  loanAfterBookingTest,
+  loanBesidePendingTest,
+  loanClashApprovedTest,
+  loanClashEdgeTest,
+  loanClashOverdueTest,
   loanDatesTest,
   loanPastStartTest,
   loanDuplicateTest,
@@ -59,6 +68,7 @@ import {
 } from "./tests/loans.js";
 import { memberEmptyHistoryTest, memberLoansTest, memberMissingTest, membersSortedTest, memberWaitlistTest } from "./tests/members.js";
 import {
+  itemDetailBookedTest,
   itemDetailIdleTest,
   itemDetailMissingTest,
   itemDetailTest,
@@ -97,6 +107,8 @@ const app = workspace("tool-lending-app")
   .registerFunctions([
     requestLoanFn,
     transitionLoanFn,
+    findClashFn,
+    approveLoanFn,
     checkoutLoanFn,
     returnLoanFn,
     cancelLoanFn,
@@ -144,6 +156,7 @@ const app = workspace("tool-lending-app")
   .registerWorkflowTests([
     listItemsFilterTest,
     itemDetailTest,
+    itemDetailBookedTest,
     itemDetailIdleTest,
     itemDetailMissingTest,
     updateItemKeepsTest,
@@ -156,8 +169,16 @@ const app = workspace("tool-lending-app")
     loanDuplicateTest,
     loanRetiredTest,
     loanWaitlistTest,
+    loanClashApprovedTest,
+    loanClashEdgeTest,
+    loanClashOverdueTest,
+    loanAfterBookingTest,
+    loanBesidePendingTest,
     approveTest,
     approveTwiceTest,
+    approveClashTest,
+    approveBesideRequestTest,
+    approveMissingTest,
     checkoutTest,
     checkoutRepairTest,
     returnTest,
