@@ -1,4 +1,5 @@
 import { defineFunction, input, inp, col, cmp, expr, s, ref, c, guard, fl, withFilters } from "@xano/sdk";
+import { refuseClash } from "./booking.js";
 import { itemTable } from "../tables/item.js";
 import { loanTable, OPEN_LOAN_STATUSES } from "../tables/loan.js";
 import { waitlistTable } from "../tables/waitlist.js";
@@ -45,6 +46,7 @@ export const requestLoanFn = defineFunction({
       error_type: "badrequest",
       error: c.text("You already have an open request for this item."),
     }),
+    ...refuseClash(inp("item_id"), inp("start_date"), inp("due_date")),
     s.db.add({
       table: loanTable,
       row: {

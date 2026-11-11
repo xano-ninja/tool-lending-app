@@ -1,6 +1,7 @@
 import { defineFunction, input, inp, expr, s, ref, c, guard, obj, withFilters, fl } from "@xano/sdk";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
+import { refuseClash } from "./booking.js";
 import { notifyWaitlistFn } from "./waitlist_notice.js";
 
 export const transitionLoanFn = defineFunction({
@@ -22,6 +23,29 @@ export const transitionLoanFn = defineFunction({
       table: loanTable,
       fieldValue: inp("loan_id"),
       data: obj({ status: inp("to") }),
+      as: "updated",
+    }),
+  ],
+  response: ref("updated"),
+});
+
+export const approveLoanFn = defineFunction({
+  name: "approve_loan",
+  description: "Approve a loan request unless its dates clash with another booking of the item.",
+  input: { loan_id: input.int({ required: true }) },
+  stack: [
+    s.db.get({ table: loanTable, fieldValue: inp("loan_id"), as: "loan" }),
+    guard.found("loan", { message: "Loan not found." }),
+    s.precondition({
+      expr: expr(ref("loan.status"), "=", c.text("requested")),
+      error_type: "badrequest",
+      error: c.text("Loan is not requested."),
+    }),
+    ...refuseClash(ref("loan.item_id"), ref("loan.start_date"), ref("loan.due_date")),
+    s.db.patch({
+      table: loanTable,
+      fieldValue: inp("loan_id"),
+      data: obj({ status: c.text("approved") }),
       as: "updated",
     }),
   ],

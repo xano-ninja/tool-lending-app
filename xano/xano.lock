@@ -41,6 +41,9 @@
     "function:add_note": {
       "guid": "4078a74e869d1cd2d5cd55c10a1796a7"
     },
+    "function:approve_loan": {
+      "guid": "e2e20d78659f2b3cb7c32d8a8adc6543"
+    },
     "function:cancel_loan": {
       "guid": "f12bf2068ba6f9cfb3eda2462eaf4439"
     },
@@ -52,6 +55,9 @@
     },
     "function:expire_waitlist_holds": {
       "guid": "63b74b26b3045d1e00aebffb77348fc0"
+    },
+    "function:find_booking_clash": {
+      "guid": "cf4eaa602cac9eff2788113c451fc8b3"
     },
     "function:flag_overdue_loans": {
       "guid": "6cc57f41d2e0863b60c4b56973945c57"
@@ -188,11 +194,20 @@
     "workflow_test:add note refuses an unknown item": {
       "guid": "15ab9a04005205ce56d55f98f1f59f30"
     },
+    "workflow_test:approve is not blocked by an overlapping request": {
+      "guid": "91e3e7e8f12fec011a7c83643d4169a3"
+    },
     "workflow_test:approve moves a requested loan to approved": {
       "guid": "9aadfcb3aaa645f34a78b7991861bd06"
     },
     "workflow_test:approve refuses a loan that is not requested": {
       "guid": "037eb372c8fe64b1b58f771cc327ea8f"
+    },
+    "workflow_test:approve refuses an unknown loan": {
+      "guid": "d9f17d4856325652642ab0a22b3f0a88"
+    },
+    "workflow_test:approve refuses dates another approved loan holds": {
+      "guid": "970d3427c48dc9a6a95925b93f9b0db2"
     },
     "workflow_test:cancel leaves the waitlist alone while the item is out": {
       "guid": "b6ef9b6a9679d7ef262494a96cfcde44"
@@ -226,6 +241,9 @@
     },
     "workflow_test:item detail is empty for an item never lent": {
       "guid": "aad3da7f4357bd6a15d9b95238eb40da"
+    },
+    "workflow_test:item detail lists bookings still to come, soonest first": {
+      "guid": "10cb5cac29c3a1051774dec0ac74ed3d"
     },
     "workflow_test:item detail refuses an unknown item": {
       "guid": "7016c4c656db9781021fe222c43b9653"
@@ -272,6 +290,9 @@
     "workflow_test:loan list filters by status, soonest due first": {
       "guid": "05972e4db76bb90c1a64150be60e6432"
     },
+    "workflow_test:loan request is not blocked by other pending or finished loans": {
+      "guid": "f8fb7c50d1abfac692442e525c63e5ce"
+    },
     "workflow_test:loan request refuses a due date before the start": {
       "guid": "a88e0b0a5efa81822c7db96b08c32600"
     },
@@ -284,8 +305,20 @@
     "workflow_test:loan request refuses a start date in the past": {
       "guid": "1d0b9dacbbe4b865ddef2a5e321f6f9f"
     },
+    "workflow_test:loan request refuses a start on the day a loan is due back": {
+      "guid": "8a950269c842123acf1b52d7113557df"
+    },
+    "workflow_test:loan request refuses any dates while the item is overdue": {
+      "guid": "b1838da6828c0eabf43995b0cf20de2b"
+    },
+    "workflow_test:loan request refuses dates inside an approved loan": {
+      "guid": "36de6158d7e63837a6807a2fe9797aa0"
+    },
     "workflow_test:loan request starts as requested": {
       "guid": "b6b3a214e26bf1be98983aecf77d0863"
+    },
+    "workflow_test:loan request takes dates after a booking": {
+      "guid": "65e29d969b1a1b52879f06179bb36c1c"
     },
     "workflow_test:loan request takes the member off the waitlist": {
       "guid": "99522ed5260bb552749b9d7b86ef1d27"
