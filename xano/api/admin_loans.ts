@@ -1,7 +1,7 @@
 import { query, input, inp, s, ref, c, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { listLoansFn } from "../functions/list_loans.js";
-import { approveLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
+import { approveLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
 import { notifyWaitlistFn } from "../functions/waitlist_notice.js";
 import { LOAN_STATUSES } from "../tables/loan.js";
 import { api } from "./group.js";
@@ -59,6 +59,23 @@ export const checkoutLoanQuery = query({
   stack: [
     ...guard.role(userTable, "admin"),
     s.function.run({ fn: checkoutLoanFn, input: { loan_id: inp("id") }, as: "updated" }),
+  ],
+  response: ref("updated"),
+});
+
+export const extendLoanQuery = query({
+  name: "loans/{id}/extend",
+  verb: "PATCH",
+  apiGroup: api,
+  auth: userTable,
+  input: { id: input.int({ required: true }), due_date: input.date({ required: true }) },
+  stack: [
+    ...guard.role(userTable, "admin"),
+    s.function.run({
+      fn: extendLoanFn,
+      input: { loan_id: inp("id"), due_date: inp("due_date") },
+      as: "updated",
+    }),
   ],
   response: ref("updated"),
 });

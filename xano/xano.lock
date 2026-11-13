@@ -56,6 +56,9 @@
     "function:expire_waitlist_holds": {
       "guid": "63b74b26b3045d1e00aebffb77348fc0"
     },
+    "function:extend_loan": {
+      "guid": "0ca1f664ed99305e370cc9988045ca6e"
+    },
     "function:find_booking_clash": {
       "guid": "cf4eaa602cac9eff2788113c451fc8b3"
     },
@@ -161,6 +164,9 @@
     "query:tool_library|PATCH|loans/{id}/checkout": {
       "guid": "c50591de4baeb73f6cecf3b2cb4cd2a8"
     },
+    "query:tool_library|PATCH|loans/{id}/extend": {
+      "guid": "c1f444a2caffd2f8425b58cebb4db019"
+    },
     "query:tool_library|PATCH|loans/{id}/reject": {
       "guid": "1258715057f1a95f213cd30e7a07ba74"
     },
@@ -235,6 +241,18 @@
     },
     "workflow_test:every lapsed hold in a run is passed on": {
       "guid": "7a3bec0c52d72c1d2574ddb07ecc0030"
+    },
+    "workflow_test:extend moves the due date and clears overdue": {
+      "guid": "3371226e8c342a0e2f071a787090ac17"
+    },
+    "workflow_test:extend refuses a date before the current one": {
+      "guid": "cd43621f86c26ab591397adef28ea37e"
+    },
+    "workflow_test:extend refuses a loan that is not out": {
+      "guid": "683bfc1b0765e24e48ce018c421b8f13"
+    },
+    "workflow_test:extend refuses dates another booking holds": {
+      "guid": "94609ab32db8ac2988b7df6aa8899c92"
     },
     "workflow_test:item back from repair notifies the waitlist": {
       "guid": "38e71c4c4a70005dd0e13a5a07a3a958"

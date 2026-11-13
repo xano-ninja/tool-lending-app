@@ -1,7 +1,7 @@
-import { workflowTest, s, ref, c } from "@xano/sdk";
+import { workflowTest, s, ref, c, obj } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { listLoansFn } from "../functions/list_loans.js";
-import { approveLoanFn, cancelLoanFn, checkoutLoanFn, returnLoanFn } from "../functions/loan_transitions.js";
+import { approveLoanFn, cancelLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn } from "../functions/loan_transitions.js";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
 import { waitlistTable } from "../tables/waitlist.js";
@@ -121,6 +121,64 @@ export const checkoutRepairTest = workflowTest({
         s.function.run({ fn: checkoutLoanFn, input: { loan_id: ref("loan.id") }, as: "updated" }),
       ],
       exception: c.text("Item is not available"),
+    }),
+  ],
+});
+
+const extend = (due: string) =>
+  s.function.run({ fn: extendLoanFn, input: { loan_id: ref("loan.id"), due_date: c.text(due) }, as: "updated" });
+
+export const extendTest = workflowTest({
+  name: "extend moves the due date and clears overdue",
+  stack: [
+    ...fixtures("out", "on_loan"),
+    s.db.patch({ table: loanTable, fieldValue: ref("loan.id"), data: obj({ overdue: c.bool(true) }) }),
+    extend("2099-01-08"),
+    s.expect.to_equal({ expr: ref("updated.due_date"), value: c.text("2099-01-08") }),
+    s.expect.to_be_false({ expr: ref("updated.overdue") }),
+  ],
+});
+
+export const extendNotOutTest = workflowTest({
+  name: "extend refuses a loan that is not out",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures("approved"), extend("2099-01-08")],
+      exception: c.text("not checked out"),
+    }),
+  ],
+});
+
+export const extendEarlierTest = workflowTest({
+  name: "extend refuses a date before the current one",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures("out", "on_loan"), extend("2026-11-05")],
+      exception: c.text("must be after the current one"),
+    }),
+  ],
+});
+
+export const extendClashTest = workflowTest({
+  name: "extend refuses dates another booking holds",
+  stack: [
+    s.expect.to_throw({
+      body: [
+        ...fixtures("out", "on_loan"),
+        member("rival", "rival@example.com"),
+        s.db.add({
+          table: loanTable,
+          row: {
+            item_id: ref("item.id"),
+            user_id: ref("rival.id"),
+            start_date: "2099-01-05",
+            due_date: "2099-01-12",
+            status: "approved",
+          },
+        }),
+        extend("2099-01-08"),
+      ],
+      exception: c.text("booked from 2099-01-05 to 2099-01-12"),
     }),
   ],
 });

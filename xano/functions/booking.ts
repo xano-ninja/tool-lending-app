@@ -10,6 +10,7 @@ export const findClashFn = defineFunction({
     item_id: input.int({ required: true }),
     start_date: input.date({ required: true }),
     due_date: input.date({ required: true }),
+    except_id: input.int(),
   },
   stack: [
     s.set_var("today", withFilters(c.now(), fl.epochms_date("Y-m-d", "UTC"))),
@@ -17,6 +18,7 @@ export const findClashFn = defineFunction({
       table: loanTable,
       where: [
         expr(col("item_id"), "=", inp("item_id")),
+        cmp(col("id"), "!=", inp("except_id"), { ignoreEmpty: true }),
         cmp(col("status"), "in", c.array([...BOOKED_LOAN_STATUSES])),
         expr(col("start_date"), "<=", inp("due_date")),
         // An overdue loan holds the item until it comes back, whatever its due date says.
@@ -34,11 +36,11 @@ export const findClashFn = defineFunction({
   response: { clash: ref("clash") },
 });
 
-export const refuseClash = (itemId: Value, startDate: Value, dueDate: Value) =>
+export const refuseClash = (itemId: Value, startDate: Value, dueDate: Value, exceptId?: Value) =>
   statements(
     s.function.run({
       fn: findClashFn,
-      input: { item_id: itemId, start_date: startDate, due_date: dueDate },
+      input: { item_id: itemId, start_date: startDate, due_date: dueDate, except_id: exceptId ?? c.null() },
       as: "booking",
     }),
     s.precondition({

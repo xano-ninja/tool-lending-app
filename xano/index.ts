@@ -4,6 +4,7 @@ import { api } from "./api/group.js";
 import {
   approveLoanQuery,
   checkoutLoanQuery,
+  extendLoanQuery,
   loansQuery,
   rejectLoanQuery,
   returnLoanQuery,
@@ -18,7 +19,7 @@ import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { itemDetailFn } from "./functions/item_detail.js";
 import { listItemsFn } from "./functions/list_items.js";
 import { listLoansFn } from "./functions/list_loans.js";
-import { approveLoanFn, cancelLoanFn, checkoutLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
+import { approveLoanFn, cancelLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { addNoteFn } from "./functions/notes.js";
 import { requestLoanFn } from "./functions/request_loan.js";
@@ -47,6 +48,10 @@ import {
   cancelTwiceTest,
   checkoutRepairTest,
   checkoutTest,
+  extendClashTest,
+  extendEarlierTest,
+  extendNotOutTest,
+  extendTest,
   listOverdueTest,
   listStatusTest,
   returnNoWaitlistTest,
@@ -112,6 +117,7 @@ const app = workspace("tool-lending-app")
     findClashFn,
     approveLoanFn,
     checkoutLoanFn,
+    extendLoanFn,
     returnLoanFn,
     cancelLoanFn,
     flagOverdueFn,
@@ -151,6 +157,7 @@ const app = workspace("tool-lending-app")
     approveLoanQuery,
     rejectLoanQuery,
     checkoutLoanQuery,
+    extendLoanQuery,
     returnLoanQuery,
     memberLoansQuery,
     membersQuery,
@@ -185,6 +192,10 @@ const app = workspace("tool-lending-app")
     approveMissingTest,
     checkoutTest,
     checkoutRepairTest,
+    extendTest,
+    extendNotOutTest,
+    extendEarlierTest,
+    extendClashTest,
     returnTest,
     returnNoWaitlistTest,
     returnTwiceTest,

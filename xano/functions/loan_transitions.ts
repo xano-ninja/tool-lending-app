@@ -85,6 +85,40 @@ export const checkoutLoanFn = defineFunction({
   response: ref("updated"),
 });
 
+export const extendLoanFn = defineFunction({
+  name: "extend_loan",
+  description: "Push back the due date of a checked-out loan unless the new dates clash with another booking.",
+  input: { loan_id: input.int({ required: true }), due_date: input.date({ required: true }) },
+  stack: [
+    s.db.get({ table: loanTable, fieldValue: inp("loan_id"), as: "loan" }),
+    guard.found("loan", { message: "Loan not found." }),
+    s.precondition({
+      expr: expr(ref("loan.status"), "=", c.text("out")),
+      error_type: "badrequest",
+      error: c.text("Loan is not checked out."),
+    }),
+    s.precondition({
+      expr: expr(inp("due_date"), ">", ref("loan.due_date")),
+      error_type: "badrequest",
+      error: c.text("New due date must be after the current one."),
+    }),
+    s.set_var("today", withFilters(c.now(), fl.epochms_date("Y-m-d", "UTC"))),
+    s.precondition({
+      expr: expr(inp("due_date"), ">=", ref("today")),
+      error_type: "badrequest",
+      error: c.text("New due date cannot be in the past."),
+    }),
+    ...refuseClash(ref("loan.item_id"), ref("loan.start_date"), inp("due_date"), inp("loan_id")),
+    s.db.patch({
+      table: loanTable,
+      fieldValue: inp("loan_id"),
+      data: obj({ due_date: inp("due_date"), overdue: c.bool(false) }),
+      as: "updated",
+    }),
+  ],
+  response: ref("updated"),
+});
+
 export const returnLoanFn = defineFunction({
   name: "return_loan",
   input: { loan_id: input.int({ required: true }) },
