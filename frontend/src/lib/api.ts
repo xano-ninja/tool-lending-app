@@ -214,6 +214,14 @@ export function actOnLoan(id: number, action: LoanAction) {
   return request<Loan>(route, routePath(route, { id }));
 }
 
+export function extendLoan(id: number, input: Omit<RouteInputs["PATCH loans/{id}/extend"], "id">) {
+  return request<Loan>(
+    "PATCH loans/{id}/extend",
+    routePath("PATCH loans/{id}/extend", { id }),
+    input,
+  );
+}
+
 export function memberLoans(id: number) {
   return request<MemberLoans>(
     "GET members/{id}/loans",

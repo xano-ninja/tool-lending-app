@@ -1,8 +1,10 @@
 <script lang="ts">
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
+  import { Input } from "$lib/components/ui/input/index.js";
   import {
     actOnLoan,
+    extendLoan,
     listItems,
     listLoans,
     listMembers,
@@ -11,7 +13,7 @@
     type LoanAction,
     type Member,
   } from "$lib/api";
-  import { errorMessage, formatDate, loanLabel, loanVariant } from "$lib/format";
+  import { addDays, errorMessage, formatDate, loanLabel, loanVariant, today } from "$lib/format";
   import { session } from "$lib/session.svelte";
 
   let requested = $state<AdminLoan[]>([]);
@@ -22,6 +24,8 @@
   let members = $state<Member[]>([]);
   let error = $state("");
   let loading = $state(true);
+  let extending = $state<number | null>(null);
+  let newDue = $state("");
 
   const isAdmin = $derived(session.user?.role === "admin");
   const onTime = $derived(out.filter((l) => !overdue.some((o) => o.id === l.id)));
@@ -55,6 +59,27 @@
     }
   }
 
+  function earliestDue(loan: AdminLoan) {
+    const next = addDays(loan.due_date, 1);
+    return next > today() ? next : today();
+  }
+
+  function startExtend(loan: AdminLoan) {
+    extending = loan.id;
+    newDue = addDays(earliestDue(loan), 6);
+  }
+
+  async function extend(loan: AdminLoan) {
+    error = "";
+    try {
+      await extendLoan(loan.id, { due_date: newDue });
+      extending = null;
+      await load();
+    } catch (e) {
+      error = errorMessage(e, "Could not extend the loan.");
+    }
+  }
+
   $effect(() => {
     if (isAdmin) load();
   });
@@ -64,7 +89,7 @@
   <title>Admin · Tool library</title>
 </svelte:head>
 
-{#snippet loanRow(loan: AdminLoan, actions: { label: string; action: LoanAction; variant?: "outline" }[])}
+{#snippet loanRow(loan: AdminLoan, actions: { label: string; action: LoanAction; variant?: "outline" }[], extendable: boolean)}
   <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
     <div class="space-y-0.5">
       <a href="/items/{loan.item_id}" class="font-medium hover:underline">
@@ -84,18 +109,35 @@
           {a.label}
         </Button>
       {/each}
+      {#if extendable && extending !== loan.id}
+        <Button size="sm" variant="outline" onclick={() => startExtend(loan)}>Extend</Button>
+      {/if}
     </div>
+    {#if extending === loan.id}
+      <form
+        class="flex w-full flex-wrap items-center justify-end gap-2"
+        onsubmit={(e) => {
+          e.preventDefault();
+          extend(loan);
+        }}
+      >
+        <label for="due-{loan.id}" class="text-muted-foreground text-sm">New due date</label>
+        <Input id="due-{loan.id}" type="date" class="w-auto" min={earliestDue(loan)} bind:value={newDue} required />
+        <Button size="sm" type="submit">Save</Button>
+        <Button size="sm" variant="ghost" onclick={() => (extending = null)}>Cancel</Button>
+      </form>
+    {/if}
   </li>
 {/snippet}
 
-{#snippet section(title: string, loans: AdminLoan[], empty: string, actions: { label: string; action: LoanAction; variant?: "outline" }[])}
+{#snippet section(title: string, loans: AdminLoan[], empty: string, actions: { label: string; action: LoanAction; variant?: "outline" }[], extendable = false)}
   <section class="space-y-2">
     <h2 class="text-lg font-medium">{title}</h2>
     {#if loans.length === 0}
       <p class="text-muted-foreground text-sm">{empty}</p>
     {:else}
       <ul class="divide-y rounded-lg border">
-        {#each loans as loan (loan.id)}{@render loanRow(loan, actions)}{/each}
+        {#each loans as loan (loan.id)}{@render loanRow(loan, actions, extendable)}{/each}
       </ul>
     {/if}
   </section>
@@ -131,10 +173,10 @@
       ])}
       {@render section("Overdue", overdue, "Nothing overdue.", [
         { label: "Mark returned", action: "return" },
-      ])}
+      ], true)}
       {@render section("On loan", onTime, "Nothing on loan.", [
         { label: "Mark returned", action: "return", variant: "outline" },
-      ])}
+      ], true)}
 
       <section class="space-y-2">
         <h2 class="text-lg font-medium">In repair</h2>
