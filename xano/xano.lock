@@ -50,6 +50,9 @@
     "function:checkout_loan": {
       "guid": "6813c81399b11d587da9ac162bf9f0fd"
     },
+    "function:clear_item_photo": {
+      "guid": "71b0847c41582d405786a4bc0afa43d7"
+    },
     "function:create_item": {
       "guid": "daa5aa96d22bbe820686bd587810946c"
     },
@@ -107,6 +110,9 @@
     "function:return_loan": {
       "guid": "8300916450595f2099c79d01e2d09a91"
     },
+    "function:set_item_photo": {
+      "guid": "9ef3dcb91c419ad2f6a92431983bd0b2"
+    },
     "function:transition_loan": {
       "guid": "31a6af62a899fef5790c4e2eb5ba4383"
     },
@@ -121,6 +127,9 @@
     },
     "query:Authentication|POST|auth/signup": {
       "guid": "ad508f9d25b77a54e415db5c45d0d8d0"
+    },
+    "query:tool_library|DELETE|items/{id}/photo": {
+      "guid": "7b52dcde129bf883f1e73c045d3b22c9"
     },
     "query:tool_library|DELETE|items/{id}/waitlist": {
       "guid": "1e4c4b95de8a5ff6b136628080d274cd"
@@ -178,6 +187,9 @@
     },
     "query:tool_library|POST|items/{id}/notes": {
       "guid": "9f0a5ac5947fb166a9bc8285131ca7b6"
+    },
+    "query:tool_library|POST|items/{id}/photo": {
+      "guid": "6ea8115c8b7a38e4d2f89698185941bd"
     },
     "query:tool_library|POST|items/{id}/waitlist": {
       "guid": "f13950d35cbdbfb29346d696753e7514"
@@ -271,6 +283,18 @@
     },
     "workflow_test:item edit that stays available leaves the waitlist alone": {
       "guid": "d71f4ec6449a6fe7798dba2ccdca75bf"
+    },
+    "workflow_test:item photo can be removed": {
+      "guid": "dc094940369d1f1de23c0db7eff06ae5"
+    },
+    "workflow_test:item photo upload is stored on the item": {
+      "guid": "0d5b02a3e2fbdb7a7eaa68e2ee8adad9"
+    },
+    "workflow_test:item photo upload refuses an unknown item": {
+      "guid": "9146da2db54b6815912510789eeda3a6"
+    },
+    "workflow_test:item photo upload replaces the earlier photo": {
+      "guid": "ce50ad2b0f5569c7dbfe8244fe4cfdfe"
     },
     "workflow_test:item update keeps the fields it is not given": {
       "guid": "b5cce87a186c1618afc8f27055d3451e"
@@ -373,6 +397,12 @@
     },
     "workflow_test:removing a held entry passes the item on": {
       "guid": "5b9ee2bf087fcc9521a0fd4230de40d3"
+    },
+    "workflow_test:removing a photo from an item without one is a no-op": {
+      "guid": "662c8cf67d9e39578ea7d2bd16340156"
+    },
+    "workflow_test:removing a photo refuses an unknown item": {
+      "guid": "9d3e4c267e3ec311ae087a23c85fd720"
     },
     "workflow_test:removing an unknown waitlist entry is refused": {
       "guid": "41547efb4d8451ec2c652c4a2bc6be81"

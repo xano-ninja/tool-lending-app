@@ -3,11 +3,17 @@
 
   import { Button } from "$lib/components/ui/button/index.js";
   import ItemForm from "$lib/components/item-form.svelte";
-  import { createItem, type ItemInput } from "$lib/api";
+  import { createItem, savePhoto, type ItemInput, type PhotoChange } from "$lib/api";
   import { session } from "$lib/session.svelte";
 
-  async function create(input: ItemInput) {
+  async function create(input: ItemInput, photo: PhotoChange) {
     const item = await createItem(input);
+    try {
+      await savePhoto(item.id, photo);
+    } catch {
+      await goto(`/admin/items/${item.id}?photo=failed`);
+      return;
+    }
     await goto(`/items/${item.id}`);
   }
 </script>

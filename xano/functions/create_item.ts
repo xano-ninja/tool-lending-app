@@ -8,7 +8,6 @@ export const createItemFn = defineFunction({
     name: input.text({ required: true }),
     category: input.text({ required: true }),
     description: input.text(),
-    photo: input.text(),
     status: input.enum([...ITEM_STATUSES]),
   },
   stack: [
@@ -18,7 +17,6 @@ export const createItemFn = defineFunction({
         name: inp("name"),
         category: inp("category"),
         description: inp("description"),
-        photo: inp("photo"),
         status: withFilters(inp("status"), fl.first_notnull("available")),
       },
       as: "item",

@@ -90,6 +90,8 @@ export const ROUTES = {
   "GET items/{id}": { verb: "GET", path: "/api:tools/items/{id}" },
   "PATCH items/{id}": { verb: "PATCH", path: "/api:tools/items/{id}" },
   "POST items/{id}/notes": { verb: "POST", path: "/api:tools/items/{id}/notes" },
+  "DELETE items/{id}/photo": { verb: "DELETE", path: "/api:tools/items/{id}/photo" },
+  "POST items/{id}/photo": { verb: "POST", path: "/api:tools/items/{id}/photo" },
   "DELETE items/{id}/waitlist": { verb: "DELETE", path: "/api:tools/items/{id}/waitlist" },
   "GET items/{id}/waitlist": { verb: "GET", path: "/api:tools/items/{id}/waitlist" },
   "POST items/{id}/waitlist": { verb: "POST", path: "/api:tools/items/{id}/waitlist" },
@@ -127,6 +129,8 @@ export function routePath(name: "POST items"): string;
 export function routePath(name: "GET items/{id}", params: { "id": string | number }): string;
 export function routePath(name: "PATCH items/{id}", params: { "id": string | number }): string;
 export function routePath(name: "POST items/{id}/notes", params: { "id": string | number }): string;
+export function routePath(name: "DELETE items/{id}/photo", params: { "id": string | number }): string;
+export function routePath(name: "POST items/{id}/photo", params: { "id": string | number }): string;
 export function routePath(name: "DELETE items/{id}/waitlist", params: { "id": string | number }): string;
 export function routePath(name: "GET items/{id}/waitlist", params: { "id": string | number }): string;
 export function routePath(name: "POST items/{id}/waitlist", params: { "id": string | number }): string;
@@ -182,7 +186,6 @@ export type RouteInputs = {
     name: string;
     category: string;
     description?: string;
-    photo?: string;
     status?: "available" | "on_loan" | "in_repair" | "retired";
   };
   "GET items/{id}": {
@@ -193,12 +196,18 @@ export type RouteInputs = {
     name?: string;
     category?: string;
     description?: string;
-    photo?: string;
     status?: "available" | "on_loan" | "in_repair" | "retired";
   };
   "POST items/{id}/notes": {
     id: number;
     note: string;
+  };
+  "DELETE items/{id}/photo": {
+    id: number;
+  };
+  "POST items/{id}/photo": {
+    id: number;
+    photo: { readonly __fileUpload?: never } | null;
   };
   "DELETE items/{id}/waitlist": {
     id: number;

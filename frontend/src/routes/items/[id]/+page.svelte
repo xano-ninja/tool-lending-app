@@ -9,6 +9,7 @@
   import { Label } from "$lib/components/ui/label/index.js";
   import { Textarea } from "$lib/components/ui/textarea/index.js";
   import AvailabilityCalendar from "$lib/components/availability-calendar.svelte";
+  import ItemPhoto from "$lib/components/item-photo.svelte";
   import {
     addNote,
     getItem,
@@ -168,7 +169,7 @@
     <div class="grid gap-6 md:grid-cols-[2fr_1fr]">
       <div class="space-y-6">
         {#if item.photo}
-          <img src={item.photo} alt={item.name} class="max-h-80 rounded-lg border object-cover" />
+          <ItemPhoto photo={item.photo} alt={item.name} class="max-h-80 w-full rounded-lg border" />
         {/if}
 
         <section class="space-y-2">

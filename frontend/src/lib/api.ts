@@ -15,9 +15,9 @@
 //   • Response types: `import type` the def. InferResponse erases to nothing.
 //
 
-import type { InferResponse } from "@xano/sdk";
+import { fileUrl, type InferResponse, type XanoFileRef } from "@xano/sdk";
 import type { loansQuery } from "../../../xano/api/admin_loans.js";
-import type { itemQuery, itemsQuery } from "../../../xano/api/items.js";
+import type { clearItemPhotoQuery, itemQuery, itemsQuery, setItemPhotoQuery } from "../../../xano/api/items.js";
 import type { myLoansQuery, requestLoanQuery } from "../../../xano/api/loans.js";
 import type { memberLoansQuery, membersQuery } from "../../../xano/api/members.js";
 import type { addNoteQuery } from "../../../xano/api/notes.js";
@@ -48,6 +48,10 @@ export const XANO_HOST: string =
   (typeof window !== "undefined" && window.XANO_HOST) ||
   import.meta.env.VITE_XANO_HOST ||
   "";
+
+export function photoUrl(photo: XanoFileRef | null | undefined): string | null {
+  return fileUrl(photo, XANO_HOST);
+}
 
 export type ItemFilters = RouteInputs["GET items"];
 export type Item = InferResponse<typeof itemsQuery>[number];
@@ -113,11 +117,12 @@ async function request<T>(
   const headers: Record<string, string> = {};
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  const multipart = body instanceof FormData;
+  if (body !== undefined && !multipart) headers["Content-Type"] = "application/json";
   const res = await fetch(XANO_HOST + path, {
     method: ROUTES[route].verb,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? undefined : multipart ? body : JSON.stringify(body),
   });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
@@ -155,6 +160,32 @@ export function updateItem(id: number, input: Omit<RouteInputs["PATCH items/{id}
     routePath("PATCH items/{id}", { id }),
     input,
   );
+}
+
+const PHOTO_FIELD: keyof RouteInputs["POST items/{id}/photo"] = "photo";
+
+export function uploadItemPhoto(id: number, file: File) {
+  const form = new FormData();
+  form.append(PHOTO_FIELD, file);
+  return request<InferResponse<typeof setItemPhotoQuery>>(
+    "POST items/{id}/photo",
+    routePath("POST items/{id}/photo", { id }),
+    form,
+  );
+}
+
+export function clearItemPhoto(id: number) {
+  return request<InferResponse<typeof clearItemPhotoQuery>>(
+    "DELETE items/{id}/photo",
+    routePath("DELETE items/{id}/photo", { id }),
+  );
+}
+
+export type PhotoChange = File | "remove" | "keep";
+
+export async function savePhoto(id: number, change: PhotoChange) {
+  if (change === "remove") await clearItemPhoto(id);
+  else if (change !== "keep") await uploadItemPhoto(id, change);
 }
 
 export function requestLoan(input: LoanRequest) {
