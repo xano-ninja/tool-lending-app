@@ -10,6 +10,12 @@ loans page, and admin pages for approving, rejecting, checking out and returning
 loans, for a member's loans and waitlist entries, and for adding and editing
 items.
 
+Admins upload an item's photo from the item editor (images up to 5 MB). It is
+stored in Xano's file storage and shown on the catalog cards and the item
+page; replacing or removing it deletes the old file. Photos go through their
+own endpoints, `POST items/{id}/photo` (multipart) and `DELETE items/{id}/photo`,
+so editing an item's other fields never touches its photo.
+
 A nightly task (`nightly_overdue`, 03:00 UTC) flags loans that are out past
 their due date and emails the borrower.
 
