@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
 
   import * as Card from "$lib/components/ui/card/index.js";
+  import ItemPhoto from "$lib/components/item-photo.svelte";
   import { listItems, type Item, type ItemFilters } from "$lib/api";
 
   const statuses = ["available", "on_loan", "in_repair", "retired"] as const;
@@ -76,7 +77,8 @@
       {#each items as item (item.id)}
         <li>
           <a href="/items/{item.id}" class="block h-full">
-            <Card.Root class="hover:border-primary h-full transition-colors">
+            <Card.Root class="hover:border-primary h-full overflow-hidden pt-0 transition-colors">
+              <ItemPhoto photo={item.photo} alt="" class="aspect-[4/3] w-full border-b" />
               <Card.Header>
                 <Card.Title>{item.name}</Card.Title>
                 <Card.Description>{item.category} · {item.status.replace("_", " ")}</Card.Description>
