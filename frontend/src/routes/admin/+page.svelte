@@ -15,6 +15,7 @@
   } from "$lib/api";
   import { addDays, errorMessage, formatDate, loanLabel, loanVariant, today } from "$lib/format";
   import { session } from "$lib/session.svelte";
+  import { clash } from "$lib/booking";
 
   let requested = $state<AdminLoan[]>([]);
   let approved = $state<AdminLoan[]>([]);
@@ -28,6 +29,16 @@
   let newDue = $state("");
 
   const isAdmin = $derived(session.user?.role === "admin");
+  const clashing = $derived(
+    new Set(
+      requested
+        .filter((l) => {
+          const others = [...requested, ...approved, ...out].filter((o) => o.item_id === l.item_id && o.id !== l.id);
+          return clash(others, l.start_date, l.due_date) !== undefined;
+        })
+        .map((l) => l.id),
+    ),
+  );
   const onTime = $derived(out.filter((l) => !overdue.some((o) => o.id === l.id)));
 
   async function load() {
@@ -103,6 +114,7 @@
       </p>
     </div>
     <div class="flex items-center gap-2">
+      {#if clashing.has(loan.id)}<Badge variant="destructive">Clashes</Badge>{/if}
       <Badge variant={loanVariant(loan)}>{loanLabel(loan)}</Badge>
       {#each actions as a (a.action)}
         <Button size="sm" variant={a.variant ?? "default"} onclick={() => act(loan, a.action)}>
