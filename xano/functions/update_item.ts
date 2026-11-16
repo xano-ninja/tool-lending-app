@@ -2,7 +2,7 @@ import { defineFunction, input, inp, expr, and, s, ref, c, guard, withFilters, f
 import { ITEM_STATUSES, itemTable } from "../tables/item.js";
 import { notifyWaitlistFn } from "./waitlist_notice.js";
 
-const keep = (field: "name" | "category" | "description" | "photo" | "status") =>
+const keep = (field: "name" | "category" | "description" | "status") =>
   withFilters(inp(field), fl.first_notnull(ref(`item.${field}`)));
 
 export const updateItemFn = defineFunction({
@@ -13,7 +13,6 @@ export const updateItemFn = defineFunction({
     name: input.text(),
     category: input.text(),
     description: input.text(),
-    photo: input.text(),
     status: input.enum([...ITEM_STATUSES]),
   },
   stack: [
@@ -26,7 +25,6 @@ export const updateItemFn = defineFunction({
         name: keep("name"),
         category: keep("category"),
         description: keep("description"),
-        photo: keep("photo"),
         status: keep("status"),
       },
       as: "updated",

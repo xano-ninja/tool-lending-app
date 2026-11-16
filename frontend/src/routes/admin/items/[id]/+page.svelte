@@ -5,19 +5,31 @@
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import ItemForm from "$lib/components/item-form.svelte";
-  import { getItem, itemWaitlist, removeWaitlistEntry, updateItem, type Item, type ItemWaitlistEntry, type ItemInput } from "$lib/api";
+  import {
+    getItem,
+    itemWaitlist,
+    removeWaitlistEntry,
+    savePhoto,
+    updateItem,
+    type Item,
+    type ItemInput,
+    type ItemWaitlistEntry,
+    type PhotoChange,
+  } from "$lib/api";
   import { errorMessage, formatTimestamp, holdUntil } from "$lib/format";
   import { session } from "$lib/session.svelte";
 
   const id = $derived(Number(page.params.id));
   const isAdmin = $derived(session.user?.role === "admin");
+  const photoFailed = $derived(page.url.searchParams.get("photo") === "failed");
 
   let item = $state<Item | null>(null);
   let error = $state("");
   let waitlist = $state<ItemWaitlistEntry[]>([]);
 
-  async function save(input: ItemInput) {
+  async function save(input: ItemInput, photo: PhotoChange) {
     await updateItem(id, input);
+    await savePhoto(id, photo);
     await goto(`/items/${id}`);
   }
 
@@ -55,6 +67,9 @@
   {:else if error}
     <p class="text-destructive text-sm">{error}</p>
   {:else if item}
+    {#if photoFailed}
+      <p class="text-destructive text-sm">The item was added, but its photo did not upload. Pick it again and save.</p>
+    {/if}
     <ItemForm {item} onsubmit={save} submitLabel="Save" />
     <section class="space-y-2">
       <h2 class="text-xl font-semibold">Waitlist</h2>

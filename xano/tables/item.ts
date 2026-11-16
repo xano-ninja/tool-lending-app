@@ -8,7 +8,7 @@ export const itemTable = table({
     name: f.text({ required: true }),
     category: f.text({ required: true }),
     description: f.text(),
-    photo: f.text(),
+    photo: f.image(),
     status: f.enum([...ITEM_STATUSES], { required: true, default: "available" }),
   },
   index: [

@@ -9,7 +9,14 @@ import {
   rejectLoanQuery,
   returnLoanQuery,
 } from "./api/admin_loans.js";
-import { createItemQuery, itemQuery, itemsQuery, updateItemQuery } from "./api/items.js";
+import {
+  clearItemPhotoQuery,
+  createItemQuery,
+  itemQuery,
+  itemsQuery,
+  setItemPhotoQuery,
+  updateItemQuery,
+} from "./api/items.js";
 import { cancelLoanQuery, myLoansQuery, requestLoanQuery } from "./api/loans.js";
 import { memberLoansQuery, membersQuery } from "./api/members.js";
 import { addNoteQuery } from "./api/notes.js";
@@ -17,6 +24,7 @@ import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQue
 import { findClashFn } from "./functions/booking.js";
 import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { itemDetailFn } from "./functions/item_detail.js";
+import { clearItemPhotoFn, setItemPhotoFn } from "./functions/item_photo.js";
 import { listItemsFn } from "./functions/list_items.js";
 import { listLoansFn } from "./functions/list_loans.js";
 import { approveLoanFn, cancelLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
@@ -88,6 +96,14 @@ import {
 import { addNoteMissingItemTest, addNoteTest } from "./tests/notes.js";
 import { overdueTest } from "./tests/overdue.js";
 import {
+  clearNoPhotoTest,
+  clearPhotoMissingTest,
+  clearPhotoTest,
+  replacePhotoTest,
+  setPhotoMissingTest,
+  setPhotoTest,
+} from "./tests/photos.js";
+import {
   aheadInLineTest,
   expireFreshTest,
   expireManyTest,
@@ -135,6 +151,8 @@ const app = workspace("tool-lending-app")
     itemDetailFn,
     createItemFn,
     updateItemFn,
+    setItemPhotoFn,
+    clearItemPhotoFn,
     listLoansFn,
     addNoteFn,
   ])
@@ -144,6 +162,8 @@ const app = workspace("tool-lending-app")
     itemQuery,
     createItemQuery,
     updateItemQuery,
+    setItemPhotoQuery,
+    clearItemPhotoQuery,
     requestLoanQuery,
     myLoansQuery,
     cancelLoanQuery,
@@ -172,6 +192,12 @@ const app = workspace("tool-lending-app")
     updateItemRepairedTest,
     updateItemStillAvailableTest,
     updateItemMissingTest,
+    setPhotoTest,
+    replacePhotoTest,
+    setPhotoMissingTest,
+    clearPhotoTest,
+    clearNoPhotoTest,
+    clearPhotoMissingTest,
     loanRequestTest,
     loanDatesTest,
     loanPastStartTest,
