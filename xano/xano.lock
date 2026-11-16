@@ -227,6 +227,9 @@
     "workflow_test:approve refuses dates another approved loan holds": {
       "guid": "970d3427c48dc9a6a95925b93f9b0db2"
     },
+    "workflow_test:approving one of two clashing requests blocks the other": {
+      "guid": "77b08dd509f08d03e85a82d3e528bf03"
+    },
     "workflow_test:cancel leaves the waitlist alone while the item is out": {
       "guid": "b6ef9b6a9679d7ef262494a96cfcde44"
     },
@@ -406,6 +409,9 @@
     },
     "workflow_test:removing an unknown waitlist entry is refused": {
       "guid": "41547efb4d8451ec2c652c4a2bc6be81"
+    },
+    "workflow_test:requested list carries what the clash flag compares": {
+      "guid": "a9ba3f166693afaae64d42462a1c0e23"
     },
     "workflow_test:return frees the item and notifies the waitlist": {
       "guid": "14edc07a8d624ff32e52c9ad8685a824"
