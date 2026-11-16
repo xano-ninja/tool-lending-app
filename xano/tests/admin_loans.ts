@@ -49,6 +49,7 @@ const rival = (status: LoanStatus) => [
       due_date: "2026-11-12",
       status,
     },
+    as: "rival_loan",
   }),
 ];
 
@@ -88,6 +89,36 @@ export const approveBesideRequestTest = workflowTest({
     ...rival("requested"),
     approve,
     s.expect.to_equal({ expr: ref("updated.status"), value: c.text("approved") }),
+  ],
+});
+
+export const approveAfterRivalTest = workflowTest({
+  name: "approving one of two clashing requests blocks the other",
+  stack: [
+    s.expect.to_throw({
+      body: [
+        ...fixtures("requested"),
+        ...rival("requested"),
+        s.function.run({ fn: approveLoanFn, input: { loan_id: ref("rival_loan.id") } }),
+        approve,
+      ],
+      exception: c.text("booked from 2026-11-06 to 2026-11-12"),
+    }),
+  ],
+});
+
+export const listClashingRequestsTest = workflowTest({
+  name: "requested list carries what the clash flag compares",
+  stack: [
+    ...fixtures("requested"),
+    ...rival("requested"),
+    s.function.run({ fn: listLoansFn, input: { status: c.text("requested") }, as: "requested" }),
+    s.expect.to_equal({ expr: ref("requested.0.id"), value: ref("loan.id") }),
+    s.expect.to_equal({ expr: ref("requested.0.item_id"), value: ref("item.id") }),
+    s.expect.to_equal({ expr: ref("requested.0.start_date"), value: c.text("2026-11-01") }),
+    s.expect.to_equal({ expr: ref("requested.1.id"), value: ref("rival_loan.id") }),
+    s.expect.to_equal({ expr: ref("requested.1.item_id"), value: ref("item.id") }),
+    s.expect.to_equal({ expr: ref("requested.1.due_date"), value: c.text("2026-11-12") }),
   ],
 });
 
