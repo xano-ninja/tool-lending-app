@@ -39,6 +39,12 @@
         .map((l) => l.id),
     ),
   );
+  const extendClash = $derived.by(() => {
+    const loan = out.find((l) => l.id === extending);
+    if (!loan || !newDue) return undefined;
+    const others = [...approved, ...out].filter((o) => o.item_id === loan.item_id && o.id !== loan.id);
+    return clash(others, addDays(loan.due_date, 1), newDue);
+  });
   const onTime = $derived(out.filter((l) => !overdue.some((o) => o.id === l.id)));
 
   async function load() {
@@ -135,7 +141,12 @@
       >
         <label for="due-{loan.id}" class="text-muted-foreground text-sm">New due date</label>
         <Input id="due-{loan.id}" type="date" class="w-auto" min={earliestDue(loan)} bind:value={newDue} required />
-        <Button size="sm" type="submit">Save</Button>
+        {#if extendClash}
+          <span class="text-destructive text-sm">
+            Booked from {formatDate(extendClash.start_date)}
+          </span>
+        {/if}
+        <Button size="sm" type="submit" disabled={!!extendClash}>Save</Button>
         <Button size="sm" variant="ghost" onclick={() => (extending = null)}>Cancel</Button>
       </form>
     {/if}
