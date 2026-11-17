@@ -269,6 +269,9 @@
     "workflow_test:extend refuses dates another booking holds": {
       "guid": "94609ab32db8ac2988b7df6aa8899c92"
     },
+    "workflow_test:extend stands when the member cannot be mailed": {
+      "guid": "09d3ff2576e98023824898e330a98b47"
+    },
     "workflow_test:item back from repair notifies the waitlist": {
       "guid": "38e71c4c4a70005dd0e13a5a07a3a958"
     },
