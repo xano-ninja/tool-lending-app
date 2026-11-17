@@ -170,6 +170,17 @@ export const extendTest = workflowTest({
   ],
 });
 
+export const extendNoMemberTest = workflowTest({
+  name: "extend stands when the member cannot be mailed",
+  stack: [
+    ...fixtures("out", "on_loan"),
+    s.db.del({ table: userTable, fieldValue: ref("member.id") }),
+    extend("2099-01-08"),
+    s.db.get({ table: loanTable, fieldValue: ref("loan.id"), as: "stored" }),
+    s.expect.to_equal({ expr: ref("stored.due_date"), value: c.text("2099-01-08") }),
+  ],
+});
+
 export const extendNotOutTest = workflowTest({
   name: "extend refuses a loan that is not out",
   stack: [

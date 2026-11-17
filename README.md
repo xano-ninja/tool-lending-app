@@ -35,6 +35,9 @@ Pending requests do not block each other, so an admin can approve one of two
 overlapping requests and the other is refused at approval. The item page shows
 the booked dates on a calendar and picks the first free week by default.
 
+An admin can push back the due date of a checked-out loan from the dashboard
+if the new dates are free; the member is emailed the new due date.
+
 Emails go through Xano's built-in mailer, and a failed send does not fail the
 request that triggered it or the nightly run.
 
