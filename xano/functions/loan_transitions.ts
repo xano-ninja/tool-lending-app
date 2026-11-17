@@ -1,4 +1,5 @@
 import { defineFunction, input, inp, expr, s, ref, c, guard, obj, withFilters, fl } from "@xano/sdk";
+import { userTable } from "@xano-sdk/auth";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
 import { refuseClash } from "./booking.js";
@@ -114,6 +115,27 @@ export const extendLoanFn = defineFunction({
       fieldValue: inp("loan_id"),
       data: obj({ due_date: inp("due_date"), overdue: c.bool(false) }),
       as: "updated",
+    }),
+    // The extension stands even if the mail does not go out.
+    s.try_catch({
+      try: [
+        s.db.get({ table: itemTable, fieldValue: ref("loan.item_id"), as: "item" }),
+        s.db.get({ table: userTable, fieldValue: ref("loan.user_id"), as: "member" }),
+        s.util.send_email({
+          service_provider: c.text("xano"),
+          to: ref("member.email"),
+          subject: withFilters(ref("item.name"), fl.concat(c.text(" loan extended"))),
+          message: withFilters(
+            c.text("Hi "),
+            fl.concat(ref("member.name")),
+            fl.concat(c.text(", your loan of the ")),
+            fl.concat(ref("item.name")),
+            fl.concat(c.text(" has been extended. It is now due back on ")),
+            fl.concat(inp("due_date")),
+            fl.concat(c.text(".")),
+          ),
+        }),
+      ],
     }),
   ],
   response: ref("updated"),
