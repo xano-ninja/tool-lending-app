@@ -15,9 +15,11 @@
     getItem,
     joinWaitlist,
     leaveWaitlist,
+    myLoans,
     myWaitlist,
     requestLoan,
     type ItemDetail,
+    type MyLoan,
     type MyWaitlistEntry,
   } from "$lib/api";
   import { clash, firstFree } from "$lib/booking";
@@ -35,6 +37,8 @@
   } from "$lib/format";
   import { session } from "$lib/session.svelte";
 
+  const OPEN = ["requested", "approved", "out"];
+
   const id = $derived(Number(page.params.id));
 
   let detail = $state<ItemDetail | null>(null);
@@ -51,7 +55,7 @@
   let datesFor = 0;
   const clashing = $derived(detail ? clash(detail.booked, startDate, dueDate) : undefined);
   let requestError = $state("");
-  let requested = $state(false);
+  let myLoan = $state<Pick<MyLoan, "id" | "status" | "start_date" | "due_date" | "overdue"> | null>(null);
 
   let note = $state("");
   let noteError = $state("");
@@ -91,8 +95,19 @@
     if (Number.isInteger(id)) load();
   });
 
+  async function loadMyLoan() {
+    try {
+      myLoan = (await myLoans()).find((l) => l.item_id === id && OPEN.includes(l.status)) ?? null;
+    } catch {
+      myLoan = null;
+    }
+  }
+
   $effect(() => {
-    if (session.user && Number.isInteger(id)) loadWaitlist();
+    if (session.user && Number.isInteger(id)) {
+      loadWaitlist();
+      loadMyLoan();
+    }
   });
 
   async function submitRequest(event: SubmitEvent) {
@@ -100,8 +115,7 @@
     busy = true;
     requestError = "";
     try {
-      await requestLoan({ item_id: id, start_date: startDate, due_date: dueDate });
-      requested = true;
+      myLoan = await requestLoan({ item_id: id, start_date: startDate, due_date: dueDate });
       myEntry = null;
     } catch (e) {
       requestError = errorMessage(e, "Could not send the request.");
@@ -240,7 +254,7 @@
                 {booked}
                 bind:start={startDate}
                 bind:due={dueDate}
-                selectable={!!session.user && !requested}
+                selectable={!!session.user && !myLoan}
               />
               {#if booked.length > 0}
                 <ul class="space-y-1 text-sm">
@@ -260,8 +274,19 @@
               <p class="text-muted-foreground text-sm">This item is retired and cannot be borrowed.</p>
             {:else if !session.user}
               <Button href="/login?next=/items/{id}" class="w-full">Sign in to borrow</Button>
-            {:else if requested}
-              <p class="text-sm">Request sent. An admin will review it.</p>
+            {:else if myLoan}
+              <div class="space-y-1 text-sm">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-medium">Your loan</span>
+                  <Badge variant={loanVariant(myLoan)}>{loanLabel(myLoan)}</Badge>
+                </div>
+                <p class="text-muted-foreground">
+                  {formatDate(myLoan.start_date)} to {formatDate(myLoan.due_date)}
+                </p>
+                {#if myLoan.status === "requested"}
+                  <p>An admin will review your request.</p>
+                {/if}
+              </div>
               <Button href="/me/loans" variant="outline" class="w-full">My loans</Button>
             {:else}
               {#if heldUntil}
@@ -290,7 +315,7 @@
               </form>
             {/if}
 
-            {#if session.user && item.status !== "retired"}
+            {#if session.user && item.status !== "retired" && !myLoan}
               <Button variant="outline" class="w-full" disabled={busy} onclick={toggleWaitlist}>
                 {onWaitlist ? "Leave waitlist" : "Join waitlist"}
               </Button>
