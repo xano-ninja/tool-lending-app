@@ -263,6 +263,9 @@
     "workflow_test:extend refuses a date before the current one": {
       "guid": "cd43621f86c26ab591397adef28ea37e"
     },
+    "workflow_test:extend refuses a date in the past": {
+      "guid": "20d909c1f0fdb6a58fc33266c4a5b6c7"
+    },
     "workflow_test:extend refuses a loan that is not out": {
       "guid": "683bfc1b0765e24e48ce018c421b8f13"
     },

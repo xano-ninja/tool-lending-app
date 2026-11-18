@@ -201,6 +201,16 @@ export const extendEarlierTest = workflowTest({
   ],
 });
 
+export const extendPastTest = workflowTest({
+  name: "extend refuses a date in the past",
+  stack: [
+    s.expect.to_throw({
+      body: [...fixtures("out", "on_loan"), extend("2026-11-10")],
+      exception: c.text("cannot be in the past"),
+    }),
+  ],
+});
+
 export const extendClashTest = workflowTest({
   name: "extend refuses dates another booking holds",
   stack: [
