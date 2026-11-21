@@ -144,7 +144,7 @@
     noteError = "";
     try {
       const added = await addNote(id, { note });
-      if (detail) detail.notes = [added, ...detail.notes];
+      if (detail) detail.notes = [{ ...added, author: session.user?.name ?? null }, ...detail.notes];
       note = "";
     } catch (e) {
       noteError = errorMessage(e, "Could not save the note.");
@@ -195,9 +195,10 @@
               {#each history as loan (loan.id)}
                 <li class="flex items-center justify-between gap-3 px-4 py-2">
                   <span>{formatDate(loan.start_date)} to {formatDate(loan.due_date)}</span>
-                  <span class="text-muted-foreground">
+                  <span class="text-muted-foreground flex items-center gap-2">
                     {#if loan.returned_at}
                       returned {formatTimestamp(loan.returned_at)}
+                      {#if loan.overdue}<Badge variant="destructive">late</Badge>{/if}
                     {:else}
                       <Badge variant={loanVariant(loan)}>{loanLabel(loan)}</Badge>
                     {/if}
@@ -224,7 +225,9 @@
             <ul class="space-y-2 text-sm">
               {#each notes as n (n.id)}
                 <li class="rounded-lg border px-4 py-2">
-                  <p class="text-muted-foreground text-xs">{formatTimestamp(n.created_at)}</p>
+                  <p class="text-muted-foreground text-xs">
+                    {formatTimestamp(n.created_at)}{#if n.author} · {n.author}{/if}
+                  </p>
                   <p class="whitespace-pre-line">{n.note}</p>
                 </li>
               {/each}
