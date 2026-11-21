@@ -71,6 +71,9 @@
     "function:item_detail": {
       "guid": "36963b80d6c303e045f6edc6a42231f5"
     },
+    "function:item_loans": {
+      "guid": "4cdf2af04f01296b6b880be3333af82b"
+    },
     "function:item_waitlist": {
       "guid": "838b4e1961a65b997facf65d76f3635e"
     },
@@ -142,6 +145,9 @@
     },
     "query:tool_library|GET|items/{id}": {
       "guid": "92e877808a4d2be0c1f1e2d1c12e5419"
+    },
+    "query:tool_library|GET|items/{id}/loans": {
+      "guid": "7e3fabc9c90cd3d7c2667a007ba3d42f"
     },
     "query:tool_library|GET|items/{id}/waitlist": {
       "guid": "920bd1f92b9862f2c26954b39b38f993"
@@ -292,6 +298,9 @@
     },
     "workflow_test:item edit that stays available leaves the waitlist alone": {
       "guid": "d71f4ec6449a6fe7798dba2ccdca75bf"
+    },
+    "workflow_test:item loans list every loan with the borrower, newest first": {
+      "guid": "0c9348f875b9d369d6d6a0a69a7c4998"
     },
     "workflow_test:item photo can be removed": {
       "guid": "dc094940369d1f1de23c0db7eff06ae5"

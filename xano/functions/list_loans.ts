@@ -47,3 +47,27 @@ export const listLoansFn = defineFunction({
   ],
   response: ref("loans"),
 });
+
+export const itemLoansFn = defineFunction({
+  name: "item_loans",
+  description: "Every loan of one item with borrower names, newest start date first.",
+  input: { item_id: input.int({ required: true }) },
+  stack: [
+    s.db.query({
+      table: loanTable,
+      where: expr(col("item_id"), "=", inp("item_id")),
+      bind: [
+        {
+          table: userTable,
+          as: "user_row",
+          join: "left",
+          where: expr(col("user_id"), "=", col("user_row.id")),
+        },
+      ],
+      eval: [{ name: "user_row.name", as: "user_name" }],
+      sort: [{ sortBy: "start_date", dir: "desc" }],
+      as: "loans",
+    }),
+  ],
+  response: ref("loans"),
+});

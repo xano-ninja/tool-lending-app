@@ -7,16 +7,18 @@
   import ItemForm from "$lib/components/item-form.svelte";
   import {
     getItem,
+    itemLoans,
     itemWaitlist,
     removeWaitlistEntry,
     savePhoto,
     updateItem,
     type Item,
+    type ItemLoan,
     type ItemInput,
     type ItemWaitlistEntry,
     type PhotoChange,
   } from "$lib/api";
-  import { errorMessage, formatTimestamp, holdUntil } from "$lib/format";
+  import { errorMessage, formatDate, formatTimestamp, holdUntil, loanLabel, loanVariant } from "$lib/format";
   import { session } from "$lib/session.svelte";
 
   const id = $derived(Number(page.params.id));
@@ -26,6 +28,7 @@
   let item = $state<Item | null>(null);
   let error = $state("");
   let waitlist = $state<ItemWaitlistEntry[]>([]);
+  let loans = $state<ItemLoan[]>([]);
 
   async function save(input: ItemInput, photo: PhotoChange) {
     await updateItem(id, input);
@@ -50,6 +53,9 @@
     itemWaitlist(id)
       .then((entries) => (waitlist = entries))
       .catch(() => (waitlist = []));
+    itemLoans(id)
+      .then((rows) => (loans = rows))
+      .catch(() => (loans = []));
   });
 </script>
 
@@ -88,6 +94,26 @@
             </li>
           {/each}
         </ol>
+      {/if}
+    </section>
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Loans</h2>
+      {#if loans.length === 0}
+        <p class="text-muted-foreground text-sm">Never requested.</p>
+      {:else}
+        <ul class="divide-y rounded-lg border text-sm">
+          {#each loans as loan (loan.id)}
+            <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-2">
+              <span>
+                <a class="underline" href="/admin/members/{loan.user_id}">{loan.user_name ?? `Member ${loan.user_id}`}</a>
+                <span class="text-muted-foreground">
+                  {formatDate(loan.start_date)} to {formatDate(loan.due_date)}
+                </span>
+              </span>
+              <Badge variant={loanVariant(loan)}>{loanLabel(loan)}</Badge>
+            </li>
+          {/each}
+        </ul>
       {/if}
     </section>
   {:else}

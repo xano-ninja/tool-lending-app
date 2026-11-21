@@ -1,6 +1,6 @@
 import { query, input, inp, s, ref, c, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { listLoansFn } from "../functions/list_loans.js";
+import { itemLoansFn, listLoansFn } from "../functions/list_loans.js";
 import { approveLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
 import { notifyWaitlistFn } from "../functions/waitlist_notice.js";
 import { LOAN_STATUSES } from "../tables/loan.js";
@@ -15,6 +15,19 @@ export const loansQuery = query({
   stack: [
     ...guard.role(userTable, "admin"),
     s.function.run({ fn: listLoansFn, input: { status: inp("status") }, as: "loans" }),
+  ],
+  response: ref("loans"),
+});
+
+export const itemLoansQuery = query({
+  name: "items/{id}/loans",
+  verb: "GET",
+  apiGroup: api,
+  auth: userTable,
+  input: { id: input.int({ required: true }) },
+  stack: [
+    ...guard.role(userTable, "admin"),
+    s.function.run({ fn: itemLoansFn, input: { item_id: inp("id") }, as: "loans" }),
   ],
   response: ref("loans"),
 });
