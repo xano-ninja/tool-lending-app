@@ -1,6 +1,6 @@
 import { workflowTest, s, ref, c, obj } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
-import { listLoansFn } from "../functions/list_loans.js";
+import { itemLoansFn, listLoansFn } from "../functions/list_loans.js";
 import { approveLoanFn, cancelLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn } from "../functions/loan_transitions.js";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
@@ -418,5 +418,45 @@ export const cancelOnLoanTest = workflowTest({
     cancel(),
     s.db.get({ table: waitlistTable, fieldValue: ref("waiting.id"), as: "after" }),
     s.expect.to_be_null({ expr: ref("after.notified_at") }),
+  ],
+});
+
+export const itemLoansTest = workflowTest({
+  name: "item loans list every loan with the borrower, newest first",
+  stack: [
+    ...fixtures("returned"),
+    member("other", "other@example.com"),
+    s.db.add({
+      table: loanTable,
+      row: {
+        item_id: ref("item.id"),
+        user_id: ref("other.id"),
+        start_date: "2026-11-10",
+        due_date: "2026-11-17",
+        status: "requested",
+      },
+      as: "later",
+    }),
+    s.db.add({
+      table: itemTable,
+      row: { name: "Other ladder", category: "ladders", status: "available" },
+      as: "elsewhere",
+    }),
+    s.db.add({
+      table: loanTable,
+      row: {
+        item_id: ref("elsewhere.id"),
+        user_id: ref("member.id"),
+        start_date: "2026-11-12",
+        due_date: "2026-11-19",
+        status: "out",
+      },
+    }),
+    s.function.run({ fn: itemLoansFn, input: { item_id: ref("item.id") }, as: "loans" }),
+    s.expect.to_equal({ expr: ref("loans.0.id"), value: ref("later.id") }),
+    s.expect.to_equal({ expr: ref("loans.0.user_name"), value: c.text("other") }),
+    s.expect.to_equal({ expr: ref("loans.1.id"), value: ref("loan.id") }),
+    s.expect.to_equal({ expr: ref("loans.1.user_name"), value: c.text("member") }),
+    s.expect.to_not_be_defined({ expr: ref("loans.2") }),
   ],
 });

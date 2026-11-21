@@ -5,6 +5,7 @@ import {
   approveLoanQuery,
   checkoutLoanQuery,
   extendLoanQuery,
+  itemLoansQuery,
   loansQuery,
   rejectLoanQuery,
   returnLoanQuery,
@@ -26,7 +27,7 @@ import { flagOverdueFn } from "./functions/flag_overdue.js";
 import { itemDetailFn } from "./functions/item_detail.js";
 import { clearItemPhotoFn, setItemPhotoFn } from "./functions/item_photo.js";
 import { listItemsFn } from "./functions/list_items.js";
-import { listLoansFn } from "./functions/list_loans.js";
+import { itemLoansFn, listLoansFn } from "./functions/list_loans.js";
 import { approveLoanFn, cancelLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { addNoteFn } from "./functions/notes.js";
@@ -64,6 +65,7 @@ import {
   extendNoMemberTest,
   extendNotOutTest,
   extendTest,
+  itemLoansTest,
   listOverdueTest,
   listStatusTest,
   returnNoWaitlistTest,
@@ -158,6 +160,7 @@ const app = workspace("tool-lending-app")
     setItemPhotoFn,
     clearItemPhotoFn,
     listLoansFn,
+    itemLoansFn,
     addNoteFn,
   ])
   .registerTasks([overdueTask, waitlistTask])
@@ -178,6 +181,7 @@ const app = workspace("tool-lending-app")
     removeWaitlistEntryQuery,
     addNoteQuery,
     loansQuery,
+    itemLoansQuery,
     approveLoanQuery,
     rejectLoanQuery,
     checkoutLoanQuery,
@@ -242,6 +246,7 @@ const app = workspace("tool-lending-app")
     cancelOnLoanTest,
     listOverdueTest,
     listStatusTest,
+    itemLoansTest,
     overdueTest,
     holdFirstTest,
     holdTakenTest,

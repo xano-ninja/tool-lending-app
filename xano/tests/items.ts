@@ -63,6 +63,7 @@ export const itemDetailTest = workflowTest({
     s.expect.to_equal({ expr: ref("detail.current_loan.id"), value: ref("current.id") }),
     s.expect.to_equal({ expr: ref("detail.waitlist_count"), value: c.int(1) }),
     s.expect.to_equal({ expr: ref("detail.notes.0.note"), value: c.text("chuck slips") }),
+    s.expect.to_equal({ expr: ref("detail.notes.0.author"), value: c.text("zoe") }),
     s.expect.to_not_be_defined({ expr: ref("detail.notes.1") }),
     s.expect.to_equal({ expr: ref("detail.history.0.id"), value: ref("current.id") }),
     s.expect.to_equal({ expr: ref("detail.history.1.id"), value: ref("second.id") }),

@@ -16,7 +16,7 @@
 //
 
 import { fileUrl, type InferResponse, type XanoFileRef } from "@xano/sdk";
-import type { loansQuery } from "../../../xano/api/admin_loans.js";
+import type { itemLoansQuery, loansQuery } from "../../../xano/api/admin_loans.js";
 import type { clearItemPhotoQuery, itemQuery, itemsQuery, setItemPhotoQuery } from "../../../xano/api/items.js";
 import type { myLoansQuery, requestLoanQuery } from "../../../xano/api/loans.js";
 import type { memberLoansQuery, membersQuery } from "../../../xano/api/members.js";
@@ -69,7 +69,10 @@ export async function listItems(filters: ItemFilters = {}): Promise<Item[]> {
 }
 
 export type Member = InferResponse<typeof membersQuery>[number];
-export type ItemDetail = InferResponse<typeof itemQuery>;
+type ItemDetailResponse = InferResponse<typeof itemQuery>;
+export type ItemDetail = Omit<ItemDetailResponse, "notes"> & {
+  notes: (Omit<ItemDetailResponse["notes"][number], "author"> & { author: string | null })[];
+};
 export type ConditionNote = InferResponse<typeof addNoteQuery>;
 export type Loan = InferResponse<typeof requestLoanQuery>;
 export type LoanRequest = RouteInputs["POST loans"];
@@ -86,6 +89,9 @@ export type ItemWaitlistEntry = Omit<InferResponse<typeof itemWaitlistQuery>[num
 export type LoanFilters = RouteInputs["GET loans"];
 export type AdminLoan = Omit<InferResponse<typeof loansQuery>[number], "item_name" | "user_name"> & {
   item_name: string | null;
+  user_name: string | null;
+};
+export type ItemLoan = Omit<InferResponse<typeof itemLoansQuery>[number], "user_name"> & {
   user_name: string | null;
 };
 type MemberLoansResponse = InferResponse<typeof memberLoansQuery>;
@@ -236,6 +242,10 @@ export function addNote(id: number, input: Omit<RouteInputs["POST items/{id}/not
 export function listLoans(filters: LoanFilters = {}) {
   const qs = filters.status ? `?status=${filters.status}` : "";
   return request<AdminLoan[]>("GET loans", routePath("GET loans") + qs);
+}
+
+export function itemLoans(id: number) {
+  return request<ItemLoan[]>("GET items/{id}/loans", routePath("GET items/{id}/loans", { id }));
 }
 
 export type LoanAction = "approve" | "reject" | "checkout" | "return";

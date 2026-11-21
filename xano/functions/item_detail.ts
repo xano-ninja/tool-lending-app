@@ -1,4 +1,5 @@
 import { defineFunction, input, inp, col, cmp, expr, or, s, ref, c, guard, withFilters, fl } from "@xano/sdk";
+import { userTable } from "@xano-sdk/auth";
 import { BOOKED_LOAN_STATUSES } from "./booking.js";
 import { conditionNoteTable } from "../tables/condition_note.js";
 import { itemTable } from "../tables/item.js";
@@ -44,8 +45,16 @@ export const itemDetailFn = defineFunction({
     s.db.query({
       table: conditionNoteTable,
       where: expr(col("item_id"), "=", inp("item_id")),
+      bind: [
+        {
+          table: userTable,
+          as: "author_row",
+          join: "left",
+          where: expr(col("user_id"), "=", col("author_row.id")),
+        },
+      ],
+      eval: [{ name: "author_row.name", as: "author" }],
       sort: [{ sortBy: "created_at", dir: "desc" }],
-      output: ["id", "created_at", "note"],
       as: "notes",
     }),
     s.db.query({
@@ -55,7 +64,7 @@ export const itemDetailFn = defineFunction({
         cmp(col("status"), "in", c.array(["out", "returned"])),
       ],
       sort: [{ sortBy: "start_date", dir: "desc" }],
-      output: ["id", "start_date", "due_date", "returned_at", "status"],
+      output: ["id", "start_date", "due_date", "returned_at", "status", "overdue"],
       as: "history",
     }),
   ],

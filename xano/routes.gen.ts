@@ -89,6 +89,7 @@ export const ROUTES = {
   "POST items": { verb: "POST", path: "/api:tools/items" },
   "GET items/{id}": { verb: "GET", path: "/api:tools/items/{id}" },
   "PATCH items/{id}": { verb: "PATCH", path: "/api:tools/items/{id}" },
+  "GET items/{id}/loans": { verb: "GET", path: "/api:tools/items/{id}/loans" },
   "POST items/{id}/notes": { verb: "POST", path: "/api:tools/items/{id}/notes" },
   "DELETE items/{id}/photo": { verb: "DELETE", path: "/api:tools/items/{id}/photo" },
   "POST items/{id}/photo": { verb: "POST", path: "/api:tools/items/{id}/photo" },
@@ -128,6 +129,7 @@ export function routePath(name: "GET items"): string;
 export function routePath(name: "POST items"): string;
 export function routePath(name: "GET items/{id}", params: { "id": string | number }): string;
 export function routePath(name: "PATCH items/{id}", params: { "id": string | number }): string;
+export function routePath(name: "GET items/{id}/loans", params: { "id": string | number }): string;
 export function routePath(name: "POST items/{id}/notes", params: { "id": string | number }): string;
 export function routePath(name: "DELETE items/{id}/photo", params: { "id": string | number }): string;
 export function routePath(name: "POST items/{id}/photo", params: { "id": string | number }): string;
@@ -197,6 +199,9 @@ export type RouteInputs = {
     category?: string;
     description?: string;
     status?: "available" | "on_loan" | "in_repair" | "retired";
+  };
+  "GET items/{id}/loans": {
+    id: number;
   };
   "POST items/{id}/notes": {
     id: number;
