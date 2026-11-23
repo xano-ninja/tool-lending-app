@@ -45,6 +45,7 @@ import { waitlistTask } from "./tasks/waitlist.js";
 import {
   approveBesideRequestTest,
   approveClashTest,
+  clashNullExceptTest,
   approveAfterRivalTest,
   listClashingRequestsTest,
   approveMissingTest,
@@ -222,6 +223,7 @@ const app = workspace("tool-lending-app")
     approveTest,
     approveTwiceTest,
     approveClashTest,
+    clashNullExceptTest,
     approveAfterRivalTest,
     listClashingRequestsTest,
     approveBesideRequestTest,

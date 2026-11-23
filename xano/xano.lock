@@ -260,6 +260,9 @@
     "workflow_test:checkout refuses an item in repair": {
       "guid": "c208befb2b716abb6c3df9820e91305a"
     },
+    "workflow_test:clash check with a null except_id skips no loan": {
+      "guid": "66ad1850417808f14471b491980493b3"
+    },
     "workflow_test:every lapsed hold in a run is passed on": {
       "guid": "7a3bec0c52d72c1d2574ddb07ecc0030"
     },
