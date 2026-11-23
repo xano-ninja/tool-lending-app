@@ -59,6 +59,23 @@ export const setPhotoMissingTest = workflowTest({
   ],
 });
 
+export const setPhotoNotImageTest = workflowTest({
+  name: "item photo upload refuses a file that is not an image",
+  stack: [
+    s.expect.to_throw({
+      body: [
+        drill,
+        s.storage.create_file_resource({
+          filename: c.text("notes.txt"),
+          filedata: c.text("not an image"),
+          as: "upload",
+        }),
+        setPhoto("updated"),
+      ],
+    }),
+  ],
+});
+
 export const clearPhotoTest = workflowTest({
   name: "item photo can be removed",
   stack: [

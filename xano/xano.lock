@@ -311,6 +311,9 @@
     "workflow_test:item photo upload is stored on the item": {
       "guid": "0d5b02a3e2fbdb7a7eaa68e2ee8adad9"
     },
+    "workflow_test:item photo upload refuses a file that is not an image": {
+      "guid": "b77804066e5ac1b8c79279a7be1cc7a0"
+    },
     "workflow_test:item photo upload refuses an unknown item": {
       "guid": "9146da2db54b6815912510789eeda3a6"
     },

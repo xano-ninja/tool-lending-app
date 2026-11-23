@@ -108,6 +108,7 @@ import {
   clearPhotoTest,
   replacePhotoTest,
   setPhotoMissingTest,
+  setPhotoNotImageTest,
   setPhotoTest,
 } from "./tests/photos.js";
 import {
@@ -204,6 +205,7 @@ const app = workspace("tool-lending-app")
     setPhotoTest,
     replacePhotoTest,
     setPhotoMissingTest,
+    setPhotoNotImageTest,
     clearPhotoTest,
     clearNoPhotoTest,
     clearPhotoMissingTest,
