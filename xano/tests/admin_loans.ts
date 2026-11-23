@@ -1,5 +1,6 @@
 import { workflowTest, s, ref, c, obj } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
+import { findClashFn } from "../functions/booking.js";
 import { itemLoansFn, listLoansFn } from "../functions/list_loans.js";
 import { approveLoanFn, cancelLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn } from "../functions/loan_transitions.js";
 import { itemTable } from "../tables/item.js";
@@ -104,6 +105,30 @@ export const approveAfterRivalTest = workflowTest({
       ],
       exception: c.text("booked from 2026-11-06 to 2026-11-12"),
     }),
+  ],
+});
+
+const findClash = (exceptId: ReturnType<typeof ref> | ReturnType<typeof c.null>) =>
+  s.function.run({
+    fn: findClashFn,
+    input: {
+      item_id: ref("item.id"),
+      start_date: c.text("2026-11-01"),
+      due_date: c.text("2026-11-08"),
+      except_id: exceptId,
+    },
+    as: "booking",
+  });
+
+export const clashNullExceptTest = workflowTest({
+  name: "clash check with a null except_id skips no loan",
+  stack: [
+    ...fixtures("requested"),
+    ...rival("approved"),
+    findClash(c.null()),
+    s.expect.to_equal({ expr: ref("booking.clash.id"), value: ref("rival_loan.id") }),
+    findClash(ref("rival_loan.id")),
+    s.expect.to_be_null({ expr: ref("booking.clash") }),
   ],
 });
 
