@@ -16,6 +16,10 @@ page; replacing or removing it deletes the old file. Photos go through their
 own endpoints, `POST items/{id}/photo` (multipart) and `DELETE items/{id}/photo`,
 so editing an item's other fields never touches its photo.
 
+The seeded items have no photos: `release create` refuses a backend whose
+source ships stored files, so none live under `xano/`. Sample photos for them
+are in `samples/photos/`; upload them from the item editor.
+
 A nightly task (`nightly_overdue`, 03:00 UTC) flags loans that are out past
 their due date and emails the borrower.
 
