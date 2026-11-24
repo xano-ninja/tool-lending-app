@@ -1,4 +1,4 @@
-import { defineFunction, input, inp, expr, s, ref, c, guard, obj, withFilters, fl } from "@xano/sdk";
+import { defineFunction, input, inp, expr, s, ref, c, guard, obj, withFilters, fl, expect, resp } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
@@ -91,7 +91,12 @@ export const extendLoanFn = defineFunction({
   description: "Push back the due date of a checked-out loan unless the new dates clash with another booking.",
   input: { loan_id: input.int({ required: true }), due_date: input.date({ required: true }) },
   stack: [
-    s.db.get({ table: loanTable, fieldValue: inp("loan_id"), as: "loan" }),
+    s.db.get({
+      table: loanTable,
+      fieldValue: inp("loan_id"),
+      as: "loan",
+      mock: { "extends with a mocked loan": obj({ id: c.int(7), item_id: c.int(3), user_id: c.int(5), status: c.text("out"), start_date: c.text("2099-01-01"), due_date: c.text("2099-01-05") }) },
+    }),
     guard.found("loan", { message: "Loan not found." }),
     s.precondition({
       expr: expr(ref("loan.status"), "=", c.text("out")),
@@ -115,12 +120,13 @@ export const extendLoanFn = defineFunction({
       fieldValue: inp("loan_id"),
       data: obj({ due_date: inp("due_date"), overdue: c.bool(false) }),
       as: "updated",
+      mock: { "extends with a mocked loan": obj({ id: c.int(7), due_date: c.text("2099-01-10"), overdue: c.bool(false) }) },
     }),
     // The extension stands even if the mail does not go out.
     s.try_catch({
       try: [
-        s.db.get({ table: itemTable, fieldValue: ref("loan.item_id"), as: "item" }),
-        s.db.get({ table: userTable, fieldValue: ref("loan.user_id"), as: "member" }),
+        s.db.get({ table: itemTable, fieldValue: ref("loan.item_id"), as: "item", mock: { "extends with a mocked loan": obj({ name: c.text("drill") }) } }),
+        s.db.get({ table: userTable, fieldValue: ref("loan.user_id"), as: "member", mock: { "extends with a mocked loan": obj({ name: c.text("Ana"), email: c.text("ana@example.com") }) } }),
         s.util.send_email({
           service_provider: c.text("xano"),
           to: ref("member.email"),
@@ -139,6 +145,16 @@ export const extendLoanFn = defineFunction({
     }),
   ],
   response: ref("updated"),
+  tests: [
+    {
+      name: "extends with a mocked loan",
+      input: { loan_id: c.int(7), due_date: c.text("2099-01-10") },
+      expect: [
+        expect.to_equal(resp("due_date"), c.text("2099-01-10")),
+        expect.to_be_false(resp("overdue")),
+      ],
+    },
+  ],
 });
 
 export const returnLoanFn = defineFunction({
