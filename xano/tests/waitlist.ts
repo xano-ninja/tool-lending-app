@@ -145,6 +145,21 @@ export const expireManyTest = workflowTest({
   ],
 });
 
+export const expireRepairTest = workflowTest({
+  name: "lapsed hold on an item in repair notifies nobody",
+  stack: [
+    ...fixtures("in_repair"),
+    entry("first", 1000, LONG_AGO),
+    entry("second", 2000),
+    s.function.run({ fn: expireHoldsFn, as: "result" }),
+    s.expect.to_equal({ expr: ref("result.expired"), value: c.int(1) }),
+    reread("first"),
+    s.expect.to_be_null({ expr: ref("first_after") }),
+    reread("second"),
+    s.expect.to_be_null({ expr: ref("second_after.notified_at") }),
+  ],
+});
+
 export const expireFreshTest = workflowTest({
   name: "a hold inside its window is kept",
   stack: [

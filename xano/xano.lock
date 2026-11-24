@@ -344,6 +344,9 @@
     "workflow_test:joining the waitlist of an unknown item is refused": {
       "guid": "3ce09251c5a5d336e62f4319890104ca"
     },
+    "workflow_test:lapsed hold on an item in repair notifies nobody": {
+      "guid": "3a31bfe45988ee781e45428c0042fae5"
+    },
     "workflow_test:lapsed hold passes the item to the next in line": {
       "guid": "a900b4fa39fba97085dd0754d3e380f7"
     },
