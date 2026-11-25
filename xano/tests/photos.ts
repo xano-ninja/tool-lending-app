@@ -72,6 +72,7 @@ export const setPhotoNotImageTest = workflowTest({
         }),
         setPhoto("updated"),
       ],
+      exception: c.text("Photo must be an image"),
     }),
   ],
 });
