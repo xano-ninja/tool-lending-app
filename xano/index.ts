@@ -23,7 +23,7 @@ import { memberLoansQuery, membersQuery } from "./api/members.js";
 import { addNoteQuery } from "./api/notes.js";
 import { joinWaitlistQuery, leaveWaitlistQuery, myWaitlistQuery, itemWaitlistQuery, removeWaitlistEntryQuery } from "./api/waitlist.js";
 import { findClashFn } from "./functions/booking.js";
-import { flagOverdueFn } from "./functions/flag_overdue.js";
+import { emailOverdueReminderFn, flagOverdueFn, overdueReminderFn } from "./functions/flag_overdue.js";
 import { itemDetailFn } from "./functions/item_detail.js";
 import { clearItemPhotoFn, setItemPhotoFn } from "./functions/item_photo.js";
 import { listItemsFn } from "./functions/list_items.js";
@@ -101,7 +101,7 @@ import {
   updateItemStillAvailableTest,
 } from "./tests/items.js";
 import { addNoteMissingItemTest, addNoteTest } from "./tests/notes.js";
-import { overdueTest } from "./tests/overdue.js";
+import { overdueDueTodayTest, overdueNoBorrowerTest, overdueTaskTest, overdueTest } from "./tests/overdue.js";
 import {
   clearNoPhotoTest,
   clearPhotoMissingTest,
@@ -146,6 +146,8 @@ const app = workspace("tool-lending-app")
     returnLoanFn,
     cancelLoanFn,
     flagOverdueFn,
+    overdueReminderFn,
+    emailOverdueReminderFn,
     notifyWaitlistFn,
     expireHoldsFn,
     removeWaitlistEntryFn,
@@ -253,6 +255,9 @@ const app = workspace("tool-lending-app")
     listStatusTest,
     itemLoansTest,
     overdueTest,
+    overdueDueTodayTest,
+    overdueNoBorrowerTest,
+    overdueTaskTest,
     holdFirstTest,
     holdTakenTest,
     holdRepairTest,

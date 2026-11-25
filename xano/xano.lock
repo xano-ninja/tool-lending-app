@@ -56,6 +56,9 @@
     "function:create_item": {
       "guid": "daa5aa96d22bbe820686bd587810946c"
     },
+    "function:email_overdue_reminder": {
+      "guid": "3e2662f762ebcae8a65c3af3ebc774d3"
+    },
     "function:expire_waitlist_holds": {
       "guid": "63b74b26b3045d1e00aebffb77348fc0"
     },
@@ -103,6 +106,9 @@
     },
     "function:notify_waitlist": {
       "guid": "1baed7e0edab367ca3c55ba59be8ab87"
+    },
+    "function:overdue_reminder": {
+      "guid": "3acfcf12590ac19adb414766782613f0"
     },
     "function:remove_waitlist_entry": {
       "guid": "a4a76eb07f0363d30d348e49a973dd1a"
@@ -416,8 +422,17 @@
     "workflow_test:members list is sorted by name without passwords": {
       "guid": "83be1dfb5c9e7f73e94f62d30220ff0e"
     },
+    "workflow_test:nightly task flags a late loan": {
+      "guid": "2ee2572ba4d0d6e0b5860273e10d1b48"
+    },
     "workflow_test:overdue job flags only loans out past due": {
       "guid": "209be9f156db65823005fafc1f4cc99c"
+    },
+    "workflow_test:overdue job flags past a borrower it cannot email": {
+      "guid": "d471cb3a0c4380310de16da1ecd7265d"
+    },
+    "workflow_test:overdue job leaves a loan due today alone": {
+      "guid": "04b805af89626cc5a73d787c6739d017"
     },
     "workflow_test:overdue list holds only loans out past due": {
       "guid": "e9133e64f240ecdb4d41af8554313376"
