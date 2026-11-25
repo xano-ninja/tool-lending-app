@@ -1,4 +1,4 @@
-import { defineFunction, input, inp, expr, s, ref, c, guard } from "@xano/sdk";
+import { defineFunction, input, inp, expr, s, ref, c, guard, fl, withFilters } from "@xano/sdk";
 import { itemTable } from "../tables/item.js";
 
 const dropOldPhoto = s.conditional({
@@ -16,6 +16,11 @@ export const setItemPhotoFn = defineFunction({
   stack: [
     s.db.get({ table: itemTable, fieldValue: inp("item_id"), as: "item" }),
     guard.found("item", { message: "Item not found." }),
+    s.precondition({
+      expr: expr(withFilters(inp("photo.mime"), fl.starts_with("image/")), "=", c.bool(true)),
+      error_type: "inputerror",
+      error: c.text("Photo must be an image."),
+    }),
     s.storage.create_image({ value: inp("photo"), access: "public", as: "image" }),
     s.db.edit({
       table: itemTable,
