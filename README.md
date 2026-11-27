@@ -58,6 +58,12 @@ member, so each endpoint's work lives in a function under `xano/functions/`
 that takes the member or item id, and the tests call those functions. The
 endpoints only check the caller's role and pass the id along.
 
+`send_email` takes no mock, so every send a unit test needs to skip sits in
+its own function (`email_loan_extended`, `email_overdue_reminder`) and the
+test mocks the `function.run`. Mocks inside a `try_catch` are exported like
+any other, but a send that throws there is swallowed, so a unit test only
+fails on the steps outside it.
+
 The backend under [`xano/`](xano/) is TypeScript on the [Xano SDK](https://github.com/xano-sdk/sdk).
 The SvelteKit frontend under [`frontend/`](frontend/) takes its request paths and
 types from the backend defs.
