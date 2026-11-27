@@ -14,7 +14,9 @@ Admins upload an item's photo from the item editor (images up to 5 MB). It is
 stored in Xano's file storage and shown on the catalog cards and the item
 page; replacing or removing it deletes the old file. Photos go through their
 own endpoints, `POST items/{id}/photo` (multipart) and `DELETE items/{id}/photo`,
-so editing an item's other fields never touches its photo.
+so editing an item's other fields never touches its photo. An upload is
+refused unless the file's own mime type is an image, which needs raw file
+access on the instance as well as file and image storage.
 
 The seeded items have no photos: `release create` refuses a backend whose
 source ships stored files, so none live under `xano/`. Sample photos for them
@@ -41,6 +43,11 @@ the booked dates on a calendar and picks the first free week by default.
 
 An admin can push back the due date of a checked-out loan from the dashboard
 if the new dates are free; the member is emailed the new due date.
+
+Marking a loan returned takes an optional condition note, logged against the
+item under the admin's name, and a needs-repair box that puts the item in
+repair instead of back on the shelf. Its waitlist is not notified until an
+admin marks it available again.
 
 Emails go through Xano's built-in mailer, and a failed send does not fail the
 request that triggered it or the nightly run.
