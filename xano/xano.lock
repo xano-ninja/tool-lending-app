@@ -56,6 +56,9 @@
     "function:create_item": {
       "guid": "daa5aa96d22bbe820686bd587810946c"
     },
+    "function:email_loan_extended": {
+      "guid": "869bcd2a7ab7ed62ff7dcea5ead35b8e"
+    },
     "function:email_overdue_reminder": {
       "guid": "3e2662f762ebcae8a65c3af3ebc774d3"
     },
@@ -455,8 +458,17 @@
     "workflow_test:return frees the item and notifies the waitlist": {
       "guid": "14edc07a8d624ff32e52c9ad8685a824"
     },
+    "workflow_test:return logs a condition note against the item": {
+      "guid": "07fd90878fef2704d081c363e8581344"
+    },
     "workflow_test:return refuses a loan that is not out": {
       "guid": "e6de2cbca37c4c044e85ad974730f370"
+    },
+    "workflow_test:return to repair holds the item back from the waitlist": {
+      "guid": "837a282c9ec91f319e16dd0eb5621620"
+    },
+    "workflow_test:return with a blank note logs nothing": {
+      "guid": "987c4a917f2a0bf5f90a0d2d85615ea6"
     },
     "workflow_test:return with an empty waitlist notifies no one": {
       "guid": "4d57c34027fa7c3e2972018e51eda131"

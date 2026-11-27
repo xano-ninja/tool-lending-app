@@ -1,10 +1,11 @@
-import { workflowTest, s, ref, c, obj } from "@xano/sdk";
+import { workflowTest, s, ref, c, obj, col, expr } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { findClashFn } from "../functions/booking.js";
 import { itemLoansFn, listLoansFn } from "../functions/list_loans.js";
 import { approveLoanFn, cancelLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn } from "../functions/loan_transitions.js";
 import { itemTable } from "../tables/item.js";
 import { LOAN_STATUSES, loanTable } from "../tables/loan.js";
+import { conditionNoteTable } from "../tables/condition_note.js";
 import { waitlistTable } from "../tables/waitlist.js";
 
 type ItemStatus = "available" | "on_loan" | "in_repair" | "retired";
@@ -260,6 +261,18 @@ export const extendClashTest = workflowTest({
   ],
 });
 
+const checkIn = (extra: { note?: string; needs_repair?: boolean }) =>
+  s.function.run({
+    fn: returnLoanFn,
+    input: {
+      loan_id: ref("loan.id"),
+      user_id: ref("member.id"),
+      ...(extra.note === undefined ? {} : { note: c.text(extra.note) }),
+      ...(extra.needs_repair === undefined ? {} : { needs_repair: c.bool(extra.needs_repair) }),
+    },
+    as: "result",
+  });
+
 export const returnTest = workflowTest({
   name: "return frees the item and notifies the waitlist",
   stack: [
@@ -269,7 +282,7 @@ export const returnTest = workflowTest({
       table: waitlistTable,
       row: { item_id: ref("item.id"), user_id: ref("waiter.id") },
     }),
-    s.function.run({ fn: returnLoanFn, input: { loan_id: ref("loan.id") }, as: "result" }),
+    checkIn({}),
     s.expect.to_equal({ expr: ref("result.loan.status"), value: c.text("returned") }),
     s.expect.to_not_be_null({ expr: ref("result.loan.returned_at") }),
     s.expect.to_equal({ expr: ref("result.notified_user_id"), value: ref("waiter.id") }),
@@ -282,7 +295,7 @@ export const returnNoWaitlistTest = workflowTest({
   name: "return with an empty waitlist notifies no one",
   stack: [
     ...fixtures("out", "on_loan"),
-    s.function.run({ fn: returnLoanFn, input: { loan_id: ref("loan.id") }, as: "result" }),
+    checkIn({}),
     s.expect.to_be_null({ expr: ref("result.notified_user_id") }),
   ],
 });
@@ -293,10 +306,64 @@ export const returnTwiceTest = workflowTest({
     s.expect.to_throw({
       body: [
         ...fixtures("returned"),
-        s.function.run({ fn: returnLoanFn, input: { loan_id: ref("loan.id") }, as: "result" }),
+        checkIn({}),
       ],
       exception: c.text("not checked out"),
     }),
+  ],
+});
+
+export const returnNoteTest = workflowTest({
+  name: "return logs a condition note against the item",
+  stack: [
+    ...fixtures("out", "on_loan"),
+    checkIn({ note: "  ladder feet worn " }),
+    s.expect.to_equal({ expr: ref("result.note.note"), value: c.text("ladder feet worn") }),
+    s.expect.to_equal({ expr: ref("result.note.item_id"), value: ref("item.id") }),
+    s.expect.to_equal({ expr: ref("result.note.user_id"), value: ref("member.id") }),
+    s.db.query({
+      table: conditionNoteTable,
+      where: expr(col("item_id"), "=", ref("item.id")),
+      returnType: "count",
+      as: "notes",
+    }),
+    s.expect.to_equal({ expr: ref("notes"), value: c.int(1) }),
+  ],
+});
+
+export const returnBlankNoteTest = workflowTest({
+  name: "return with a blank note logs nothing",
+  stack: [
+    ...fixtures("out", "on_loan"),
+    checkIn({ note: "   " }),
+    s.expect.to_be_null({ expr: ref("result.note") }),
+    s.db.query({
+      table: conditionNoteTable,
+      where: expr(col("item_id"), "=", ref("item.id")),
+      returnType: "count",
+      as: "notes",
+    }),
+    s.expect.to_equal({ expr: ref("notes"), value: c.int(0) }),
+  ],
+});
+
+export const returnToRepairTest = workflowTest({
+  name: "return to repair holds the item back from the waitlist",
+  stack: [
+    ...fixtures("out", "on_loan"),
+    member("waiter", "waiter@example.com"),
+    s.db.add({
+      table: waitlistTable,
+      row: { item_id: ref("item.id"), user_id: ref("waiter.id") },
+      as: "entry",
+    }),
+    checkIn({ note: "cracked rung", needs_repair: true }),
+    s.expect.to_equal({ expr: ref("result.loan.status"), value: c.text("returned") }),
+    s.expect.to_be_null({ expr: ref("result.notified_user_id") }),
+    s.db.get({ table: itemTable, fieldValue: ref("item.id"), as: "after" }),
+    s.expect.to_equal({ expr: ref("after.status"), value: c.text("in_repair") }),
+    s.db.get({ table: waitlistTable, fieldValue: ref("entry.id"), as: "waiting" }),
+    s.expect.to_be_null({ expr: ref("waiting.notified_at") }),
   ],
 });
 

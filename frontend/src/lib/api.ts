@@ -255,6 +255,16 @@ export function actOnLoan(id: number, action: LoanAction) {
   return request<Loan>(route, routePath(route, { id }));
 }
 
+export type ReturnInput = Omit<RouteInputs["PATCH loans/{id}/return"], "id">;
+
+export function returnLoan(id: number, input: ReturnInput) {
+  return request<Loan>(
+    "PATCH loans/{id}/return",
+    routePath("PATCH loans/{id}/return", { id }),
+    input,
+  );
+}
+
 export function extendLoan(id: number, input: Omit<RouteInputs["PATCH loans/{id}/extend"], "id">) {
   return request<Loan>(
     "PATCH loans/{id}/extend",
