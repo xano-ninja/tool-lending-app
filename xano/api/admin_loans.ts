@@ -1,4 +1,4 @@
-import { query, input, inp, s, ref, c, guard } from "@xano/sdk";
+import { query, input, inp, s, ref, c, auth, guard } from "@xano/sdk";
 import { userTable } from "@xano-sdk/auth";
 import { itemLoansFn, listLoansFn } from "../functions/list_loans.js";
 import { approveLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn, transitionLoanFn } from "../functions/loan_transitions.js";
@@ -98,10 +98,18 @@ export const returnLoanQuery = query({
   verb: "PATCH",
   apiGroup: api,
   auth: userTable,
-  input: { id: input.int({ required: true }) },
+  input: {
+    id: input.int({ required: true }),
+    note: input.text({ methods: ["trim"] }),
+    needs_repair: input.bool(),
+  },
   stack: [
     ...guard.role(userTable, "admin"),
-    s.function.run({ fn: returnLoanFn, input: { loan_id: inp("id") }, as: "result" }),
+    s.function.run({
+      fn: returnLoanFn,
+      input: { loan_id: inp("id"), user_id: auth("id"), note: inp("note"), needs_repair: inp("needs_repair") },
+      as: "result",
+    }),
   ],
   response: ref("result.loan"),
 });

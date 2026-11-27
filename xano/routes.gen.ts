@@ -249,6 +249,8 @@ export type RouteInputs = {
   };
   "PATCH loans/{id}/return": {
     id: number;
+    note?: string;
+    needs_repair?: boolean;
   };
   "GET me/loans": {};
   "GET me/waitlist": {};

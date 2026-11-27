@@ -28,7 +28,15 @@ import { itemDetailFn } from "./functions/item_detail.js";
 import { clearItemPhotoFn, setItemPhotoFn } from "./functions/item_photo.js";
 import { listItemsFn } from "./functions/list_items.js";
 import { itemLoansFn, listLoansFn } from "./functions/list_loans.js";
-import { approveLoanFn, cancelLoanFn, checkoutLoanFn, extendLoanFn, returnLoanFn, transitionLoanFn } from "./functions/loan_transitions.js";
+import {
+  approveLoanFn,
+  cancelLoanFn,
+  checkoutLoanFn,
+  emailLoanExtendedFn,
+  extendLoanFn,
+  returnLoanFn,
+  transitionLoanFn,
+} from "./functions/loan_transitions.js";
 import { listMembersFn, memberHistoryFn, memberLoansFn } from "./functions/members.js";
 import { addNoteFn } from "./functions/notes.js";
 import { requestLoanFn } from "./functions/request_loan.js";
@@ -69,8 +77,11 @@ import {
   itemLoansTest,
   listOverdueTest,
   listStatusTest,
+  returnBlankNoteTest,
+  returnNoteTest,
   returnNoWaitlistTest,
   returnTest,
+  returnToRepairTest,
   returnTwiceTest,
 } from "./tests/admin_loans.js";
 import {
@@ -143,6 +154,7 @@ const app = workspace("tool-lending-app")
     approveLoanFn,
     checkoutLoanFn,
     extendLoanFn,
+    emailLoanExtendedFn,
     returnLoanFn,
     cancelLoanFn,
     flagOverdueFn,
@@ -244,6 +256,9 @@ const app = workspace("tool-lending-app")
     returnTest,
     returnNoWaitlistTest,
     returnTwiceTest,
+    returnNoteTest,
+    returnBlankNoteTest,
+    returnToRepairTest,
     cancelTest,
     cancelApprovedTest,
     cancelTwiceTest,
