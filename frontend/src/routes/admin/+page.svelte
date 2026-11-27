@@ -1,13 +1,17 @@
 <script lang="ts">
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
+  import { Checkbox } from "$lib/components/ui/checkbox/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
+  import { Label } from "$lib/components/ui/label/index.js";
+  import { Textarea } from "$lib/components/ui/textarea/index.js";
   import {
     actOnLoan,
     extendLoan,
     listItems,
     listLoans,
     listMembers,
+    returnLoan,
     type AdminLoan,
     type Item,
     type LoanAction,
@@ -27,6 +31,9 @@
   let loading = $state(true);
   let extending = $state<number | null>(null);
   let newDue = $state("");
+  let returning = $state<number | null>(null);
+  let returnNote = $state("");
+  let needsRepair = $state(false);
 
   const isAdmin = $derived(session.user?.role === "admin");
   const clashing = $derived(
@@ -76,12 +83,31 @@
     }
   }
 
+  function startReturn(loan: AdminLoan) {
+    extending = null;
+    returning = loan.id;
+    returnNote = "";
+    needsRepair = false;
+  }
+
+  async function checkIn(loan: AdminLoan) {
+    error = "";
+    try {
+      await returnLoan(loan.id, { note: returnNote.trim() || undefined, needs_repair: needsRepair });
+      returning = null;
+      await load();
+    } catch (e) {
+      error = errorMessage(e, "Could not return the loan.");
+    }
+  }
+
   function earliestDue(loan: AdminLoan) {
     const next = addDays(loan.due_date, 1);
     return next > today() ? next : today();
   }
 
   function startExtend(loan: AdminLoan) {
+    returning = null;
     extending = loan.id;
     newDue = addDays(earliestDue(loan), 6);
   }
@@ -122,12 +148,16 @@
     <div class="flex items-center gap-2">
       {#if clashing.has(loan.id)}<Badge variant="destructive">Clashes</Badge>{/if}
       <Badge variant={loanVariant(loan)}>{loanLabel(loan)}</Badge>
-      {#each actions as a (a.action)}
-        <Button size="sm" variant={a.variant ?? "default"} onclick={() => act(loan, a.action)}>
+      {#each actions.filter((a) => a.action !== "return" || returning !== loan.id) as a (a.action)}
+        <Button
+          size="sm"
+          variant={a.variant ?? "default"}
+          onclick={() => (a.action === "return" ? startReturn(loan) : act(loan, a.action))}
+        >
           {a.label}
         </Button>
       {/each}
-      {#if extendable && extending !== loan.id}
+      {#if extendable && extending !== loan.id && returning !== loan.id}
         <Button size="sm" variant="outline" onclick={() => startExtend(loan)}>Extend</Button>
       {/if}
     </div>
@@ -148,6 +178,35 @@
         {/if}
         <Button size="sm" type="submit" disabled={!!extendClash}>Save</Button>
         <Button size="sm" variant="ghost" onclick={() => (extending = null)}>Cancel</Button>
+      </form>
+    {/if}
+    {#if returning === loan.id}
+      <form
+        class="w-full space-y-3"
+        onsubmit={(e) => {
+          e.preventDefault();
+          checkIn(loan);
+        }}
+      >
+        <div class="space-y-1.5">
+          <Label for="note-{loan.id}">Condition note</Label>
+          <Textarea
+            id="note-{loan.id}"
+            rows={2}
+            placeholder="Optional, shown on the item page"
+            bind:value={returnNote}
+          />
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <Checkbox id="repair-{loan.id}" bind:checked={needsRepair} />
+            <Label for="repair-{loan.id}">Needs repair</Label>
+          </div>
+          <div class="flex items-center gap-2">
+            <Button size="sm" type="submit">{needsRepair ? "Return to repair" : "Return"}</Button>
+            <Button size="sm" variant="ghost" onclick={() => (returning = null)}>Cancel</Button>
+          </div>
+        </div>
       </form>
     {/if}
   </li>
